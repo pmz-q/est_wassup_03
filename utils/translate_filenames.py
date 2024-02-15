@@ -8,7 +8,7 @@ from os import listdir, rename, walk
 from uuid import uuid4
 
 
-def dfs(content:dict={"name": "root", "content": {}}, parent_path:str="../data", filename_old_to_new:dict={}):
+def dfs(content:dict={"name": "root", "content": {}}, parent_path:str="../data", filename_old_to_new:dict={}, change_folder_name:bool=False):
   for dir in listdir(parent_path):
     uuid = str(uuid4())
     if isfile(f"{parent_path}/{dir}"): # rename files
@@ -22,10 +22,15 @@ def dfs(content:dict={"name": "root", "content": {}}, parent_path:str="../data",
         # 이거 개발할 땐 data/images/anger... data/labels/anger... 이런식의 구조에서 짬
         filename_old_to_new[dir] = f"{parent_path.replace('../data/images/', '')}/{uuid}"
     else: # rename dirs
-      content["content"][uuid] = { "name": dir, "content": {} }
-      new_path = f"{parent_path}/{uuid}"
-      rename(f"{parent_path}/{dir}", new_path)
-      dfs(content["content"][uuid], new_path, filename_old_to_new)
+      if change_folder_name:
+        content["content"][uuid] = { "name": dir, "content": {} }
+        new_path = f"{parent_path}/{uuid}"
+        rename(f"{parent_path}/{dir}", new_path)
+        dfs(content["content"][uuid], new_path, filename_old_to_new)
+      else:
+        content["content"][dir] = { "name": dir, "content": {} }
+        new_path = f"{parent_path}/{dir}"
+        dfs(content["content"][dir], new_path, filename_old_to_new)
 
 def kor_to_uuid(cfg):
   root_dir = cfg.dir_path

@@ -61,6 +61,13 @@ def convert_origin_to_coco(
   change_img_name:bool=False, img_names:dict={"old": "new"}
 ):
   for annot in origin_annots:
+    img_filename = ""
+    try:
+      img_filename = img_names[annot["filename"]]
+    except KeyError:
+      if change_img_name: continue
+      else: img_filename = annot["filename"]
+    
     boxes = annot["annot_A"]["boxes"]
     img_id = len(coco_annot["images"]) + 1
     width = boxes["maxX"] - boxes["minX"]
@@ -71,7 +78,7 @@ def convert_origin_to_coco(
       "id": img_id,
       "width": width,
       "height": height,
-      "file_name": annot["filename"] if not change_img_name else img_names[annot["filename"]],
+      "file_name": img_filename,
       "date_captured": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     })
     

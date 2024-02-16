@@ -61,13 +61,14 @@ def create_features_dirs(dst_data_dir:str, selection_ratio:float) -> str:
   dst_data_dir = f"{dst_data_dir}_{selection_ratio}"
   new_num = 1
   
-  while exists(dst_data_dir):
-    dst_data_dir = dst_data_dir + f"_{new_num}"
+  new_dst_data_dir = dst_data_dir
+  while exists(new_dst_data_dir):
+    new_dst_data_dir = dst_data_dir + f"_{new_num}"
     new_num += 1
-  makedirs(dst_data_dir)
+  makedirs(new_dst_data_dir)
   
-  dir_images = f"{dst_data_dir}/images"
-  dir_labels = f"{dst_data_dir}/labels"
+  dir_images = f"{new_dst_data_dir}/images"
+  dir_labels = f"{new_dst_data_dir}/labels"
   
   # create directories
   # check <TO> structure view above
@@ -79,7 +80,7 @@ def create_features_dirs(dst_data_dir:str, selection_ratio:float) -> str:
       makedirs(f"{dir_images}/{d_type}/{emotion}", exist_ok=True)
       makedirs(f"{dir_labels}/{d_type}/{emotion}", exist_ok=True)
   
-  return dst_data_dir
+  return new_dst_data_dir
 
 def move_data_to_features(src_data_dir:str, dst_data_dir:str, selection_ratio:float):
   dir_images = f"{dst_data_dir}/images"

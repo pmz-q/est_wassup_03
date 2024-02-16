@@ -108,7 +108,7 @@ def move_data_to_features(src_data_dir:str, dst_data_dir:str, selection_ratio:fl
       selected_imgs = random.sample(list_of_imgs, int(len(list_of_imgs) * selection_ratio))
       for img in selected_imgs:
         src_img = f"{dir_emotion}/raw/train/{img}"
-        dst_img = f"{dir_images}/{img}"
+        dst_img = f"{dir_img_train}/{img}"
         shutil.copy(src_img, dst_img)
       
       # copy to the directory

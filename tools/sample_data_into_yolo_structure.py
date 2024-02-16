@@ -96,6 +96,7 @@ def move_data_to_features(src_data_dir:str, dst_data_dir:str, selection_ratio:fl
       
       # select full*ratio number of images
       list_of_imgs = listdir(f"{dir_emotion}/raw/train")
+      list_of_imgs = list(filter(lambda x: not x.endswith(".zip"), list_of_imgs))
       selected_imgs = random.sample(list_of_imgs, int(len(list_of_imgs) * selection_ratio))
       for img in selected_imgs:
         src_img = f"{dir_emotion}/raw/train/{img}"

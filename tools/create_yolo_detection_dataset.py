@@ -26,19 +26,19 @@ from typing import Literal
 
 /images
     /train
-    /val
+    /tst
 /labels
     /train
-    /val
+    /tst
 """
 
 DIR_LEVEL_1 = ("images", "labels")
-DIR_LEVEL_2 = ("train", "val")
+DIR_LEVEL_2 = ("train", "tst")
 
 def bbox_2_yolo(bbox, img_w, img_h):
   x, y, w, h = bbox[0], bbox[1], bbox[2], bbox[3]
-  centerx = x + w / 2
-  centery = y + h / 2
+  centerx = bbox[0] + w / 2
+  centery = bbox[1] + h / 2
   dw = 1 / img_w
   dh = 1 / img_h
   centerx *= dw
@@ -46,6 +46,7 @@ def bbox_2_yolo(bbox, img_w, img_h):
   centery *= dh
   h *= dh
   return centerx, centery, w, h
+
 
 def convert_anno(src_data_path:str, mode:Literal["train", "tst"]="train"):
   """

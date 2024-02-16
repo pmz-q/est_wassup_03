@@ -136,7 +136,7 @@ if __name__ == "__main__":
   
   parser.add_argument("--selection-ratio", type=float, default=0.8)
   parser.add_argument("--src-data-path", type=str, default="/home/KDT-admin/data")
-  parser.add_argument("--dst-data-path", type=str, default="/home/KDT-admin/work/selected-images")
+  parser.add_argument("--dst-data-path", type=str, default="/home/KDT-admin/work/selected_images")
   
   config = parser.parse_args()
   main(config)

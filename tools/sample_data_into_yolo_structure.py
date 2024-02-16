@@ -53,8 +53,14 @@ ROOT_PATH = Path(__file__).parent # est_wassup_03
 
 
 
-def create_features_dirs(dst_data_dir:str):
+def create_features_dirs(dst_data_dir:str, selection_ratio:float) -> str:
+  """
+  Returns:
+      str: dst data dir
+  """
+  dst_data_dir = f"{dst_data_dir}_{selection_ratio}"
   new_num = 1
+  
   while exists(dst_data_dir):
     dst_data_dir = dst_data_dir + f"_{new_num}"
     new_num += 1
@@ -72,6 +78,8 @@ def create_features_dirs(dst_data_dir:str):
     for emotion in EMOTIONS:
       makedirs(f"{dir_images}/{d_type}/{emotion}", exist_ok=True)
       makedirs(f"{dir_labels}/{d_type}/{emotion}", exist_ok=True)
+  
+  return dst_data_dir
 
 def move_data_to_features(src_data_dir:str, dst_data_dir:str, selection_ratio:float):
   dir_images = f"{dst_data_dir}/images"
@@ -118,7 +126,7 @@ def main(cfg):
   elif isfile(src_data_dir): raise FileNotFoundError(f"[{src_data_dir}] is not a directory. It supposed to be a directory!")
   else:
     # create est_wassup_03/features
-    create_features_dirs(dst_data_dir)
+    dst_data_dir = create_features_dirs(dst_data_dir, selection_ratio)
     
     # move data to features
     move_data_to_features(src_data_dir, dst_data_dir, selection_ratio)

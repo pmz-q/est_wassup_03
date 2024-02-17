@@ -132,7 +132,7 @@ if __name__ == "__main__":
   parser = argparse.ArgumentParser()
   
   parser.add_argument("--src-data-path", type=str, default="../data")
-  parser.add_argument("--dst-data-path", type=str, default="../features")
+  parser.add_argument("--dst-data-path", type=str, default="../yolo-detection-data")
   
   config = parser.parse_args()
   main(config)

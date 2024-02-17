@@ -1,8 +1,13 @@
 import argparse
-import json
-from os.path import isfile, exists
-from os import walk
+from copy import deepcopy
+# import cv2
 from datetime import datetime
+import json
+import os
+from os import walk
+from os.path import isfile, exists
+from PIL import Image
+import sys
 
 
 COCO_ANNOT = {
@@ -57,9 +62,10 @@ CAT_MAPPER = {
 }
 
 def convert_origin_to_coco(
-  origin_annots:list, coco_annot:dict=COCO_ANNOT,
+  origin_annots:list, img_root_dir:str, coco_annot:dict=None,
   change_img_name:bool=False, img_names:dict={"old": "new"}
 ):
+  if coco_annot == None: coco_annot = deepcopy(COCO_ANNOT)
   for annot in origin_annots:
     img_filename = ""
     try:
@@ -68,16 +74,21 @@ def convert_origin_to_coco(
       if change_img_name: continue
       else: img_filename = annot["filename"]
     
-    boxes = annot["annot_A"]["boxes"]
+    boxes = annot["annot_C"]["boxes"]
     img_id = len(coco_annot["images"]) + 1
+    
+    assert boxes["maxX"] > boxes["minX"] and boxes["maxY"] > boxes["minY"], f"Box size error !: (xmin, ymin, xmax, ymax): {boxes['minX'], boxes['minY'], boxes['maxX'], boxes['maxY']}"
     width = boxes["maxX"] - boxes["minX"]
     height = boxes["maxY"] - boxes["minY"]
+    
+    # img_height, img_width, _ = cv2.imread(f"{img_root_dir}/{img_filename}").shape
+    img_width, img_height = Image.open(f"{img_root_dir}/{img_filename}").size
     
     # images
     coco_annot["images"].append({
       "id": img_id,
-      "width": width,
-      "height": height,
+      "width": img_width,
+      "height": img_height,
       "file_name": img_filename,
       "date_captured": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     })
@@ -89,7 +100,7 @@ def convert_origin_to_coco(
       "image_id": img_id,
       "bbox": [
         boxes["minX"], # x
-        boxes["maxY"], # y
+        boxes["minY"], # y
         width, # width
         height # height
       ]
@@ -98,6 +109,7 @@ def convert_origin_to_coco(
   return coco_annot
 
 def main(cfg):
+  # TODO: functions has been updated. This main function need to be updated as so.
   root_dir = cfg.dir_path
   new_coco_annot = {}
   
@@ -114,10 +126,10 @@ def main(cfg):
   with open(f"{root_dir}/annotation.json", "w", encoding="cp949") as f:
     json.dump(new_coco_annot, f)
   
-if __name__ == "__main__":
-  parser = argparse.ArgumentParser()
+# if __name__ == "__main__":
+#   parser = argparse.ArgumentParser()
   
-  parser.add_argument("--dir-path", type=str, default="../data/labels")
+#   parser.add_argument("--dir-path", type=str, default="../data/labels")
   
-  config = parser.parse_args()
-  main(config)
+#   config = parser.parse_args()
+#   main(config)

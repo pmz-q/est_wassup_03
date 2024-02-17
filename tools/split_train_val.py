@@ -160,13 +160,7 @@ def write_yolo_dataset_yaml(dst_root_dir: str):
       "val": "images/val",
       "test": "images/test",
       "names": {
-        1: "anger",
-        2: "anxiety",
-        3: "embarrass",
-        4: "happy",
-        5: "normal",
-        6: "pain",
-        7: "sad"
+        0: "face"
       }
     }, f)
 

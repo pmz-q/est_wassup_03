@@ -99,7 +99,8 @@ def write_yolo_annot_txt(src_data_path:str, dst_data_path:str, anno_dict:dict, m
     file_name = origin_file_name.split(".")[0] + ".txt"
     with open(f"{dst_data_path}/labels/{mode}/{file_name}", 'w', encoding='cp949') as f:
       for obj in v:
-        category_id = obj[1]
+        # category_id = obj[1]
+        category_id = 0 # detect face only
         box = ['{:.6f}'.format(x) for x in obj[2]]
         box = ' '.join(box)
         line = str(category_id) + ' ' + box

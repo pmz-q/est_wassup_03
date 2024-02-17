@@ -35,20 +35,20 @@ import warnings
     /train
         /anger
         /happy
-    /tst
+    /test
         /anger
         /happy
 /labels
     /train
         /anger
         /happy
-    /tst
+    /test
         /anger
         /happy
 """
 
 EMOTIONS = ("anger", "anxiety", "embarrass", "happy", "normal", "pain", "sad")
-DATA_TYPES = ("train", "tst")
+DATA_TYPES = ("train", "test")
 ROOT_PATH = Path(__file__).parent # est_wassup_03
 
 
@@ -94,14 +94,14 @@ def move_data_to_features(src_data_dir:str, dst_data_dir:str, selection_ratio:fl
     else:
       dir_img_train = f"{dir_images}/train/{emotion}"
       dir_label_train = f"{dir_labels}/train/{emotion}"
-      dir_img_tst = f"{dir_images}/tst/{emotion}"
-      dir_label_tst = f"{dir_labels}/tst/{emotion}"
+      dir_img_test = f"{dir_images}/test/{emotion}"
+      dir_label_test = f"{dir_labels}/test/{emotion}"
       
       # empty the directory
       if len(listdir(dir_img_train)) != 0: shutil.rmtree(dir_img_train)
       if len(listdir(dir_label_train)) != 0: shutil.rmtree(dir_label_train)
-      if len(listdir(dir_img_tst)) != 0: shutil.rmtree(dir_img_tst)
-      if len(listdir(dir_label_tst)) != 0: shutil.rmtree(dir_label_tst)
+      if len(listdir(dir_img_test)) != 0: shutil.rmtree(dir_img_test)
+      if len(listdir(dir_label_test)) != 0: shutil.rmtree(dir_label_test)
       
       # select full*ratio number of images
       list_of_imgs = listdir(f"{dir_emotion}/raw/train")
@@ -115,8 +115,8 @@ def move_data_to_features(src_data_dir:str, dst_data_dir:str, selection_ratio:fl
       # copy to the directory
       # shutil.copytree(f"{dir_emotion}/raw/train", dir_img_train, dirs_exist_ok=True)  
       shutil.copytree(f"{dir_emotion}/labeled/train", dir_label_train, dirs_exist_ok=True)
-      shutil.copyfile(f"{dir_test_set}.json", f"{dir_label_tst}/{emotion}.json")
-      shutil.copytree(dir_test_set, dir_img_tst, dirs_exist_ok=True)
+      shutil.copyfile(f"{dir_test_set}.json", f"{dir_label_test}/{emotion}.json")
+      shutil.copytree(dir_test_set, dir_img_test, dirs_exist_ok=True)
   
 def main(cfg):
   src_data_dir = cfg.src_data_path

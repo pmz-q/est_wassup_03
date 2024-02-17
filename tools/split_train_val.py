@@ -2,10 +2,13 @@ import argparse
 from copy import deepcopy
 import json
 from os import listdir, makedirs
+from os.path import exists
+from os.path import abspath
 from pycocotools.coco import COCO
 import random
 import shutil
 from typing import Literal
+import yaml
 
 
 """
@@ -15,14 +18,14 @@ from typing import Literal
     /train
         /anger
         /happy
-    /tst
+    /test
         /anger
         /happy
 /labels
     /train
         /anger
         /happy
-    /tst
+    /test
         /anger
         /happy
 
@@ -30,10 +33,10 @@ from typing import Literal
 
 /images
     /train
-    /tst
+    /test
 /labels
     /train
-    /tst
+    /test
 """
 
 COCO_ANNOT = {
@@ -147,7 +150,35 @@ def coco_annotation_split(annot_path:str, trn_images:list, val_images:list, val_
       trn_images.remove(img_name_only)
       trn_annot["images"].append(img)
       trn_annot["annotations"].append(ann)
-    
+
+def write_yolo_dataset_yaml(dst_root_dir: str):
+  dst_root_abs = abspath(dst_root_dir)
+  with open(f"{dst_root_dir}/yolo-dataset.yaml", "w", encoding="cp949") as f:
+    yaml.dump({
+      "path": f"{dst_root_abs}",
+      "train": "images/train",
+      "val": "images/val",
+      "test": "images/test",
+      "names": {
+        1: "anger",
+        2: "anxiety",
+        3: "embarrass",
+        4: "happy",
+        5: "normal",
+        6: "pain",
+        7: "sad"
+      }
+    }, f)
+
+def copy_test_set(src_root_dir: str, dst_root_dir: str):
+  if src_root_dir != dst_root_dir:
+    dst_images_test = f"{dst_root_dir}/images/test"
+    dst_labels_test = f"{dst_root_dir}/labels/test"
+    shutil.rmtree(dst_images_test, ignore_errors=True)
+    shutil.rmtree(dst_labels_test, ignore_errors=True)
+    shutil.copytree(f"{src_root_dir}/images/test", dst_images_test)
+    shutil.copytree(f"{src_root_dir}/labels/test", dst_labels_test)
+
 def yolo_detection_split(src_root_dir: str, dst_root_dir: str, train_ratio:float):
   """
   this will reformat the source root dir if src_root_dir == dst_root_dir
@@ -171,6 +202,8 @@ def yolo_detection_split(src_root_dir: str, dst_root_dir: str, train_ratio:float
     process_file_action(src_root_dir, dst_root_dir, img, "train", do_for_label=True)
   for img in val_images:
     process_file_action(src_root_dir, dst_root_dir, img, "val", do_for_label=True)
+  
+  write_yolo_dataset_yaml(dst_root_dir)
 
 def yolo_classification_split(src_root_dir: str, dst_root_dir: str, train_ratio:float):
   """
@@ -269,6 +302,7 @@ def main(cfg):
   }
   
   splitter_map[task][annot_format](src_root_dir, dst_root_dir, train_ratio)
+  copy_test_set(src_root_dir, dst_root_dir)
 
 if __name__ == "__main__":
   parser = argparse.ArgumentParser()

@@ -11,14 +11,14 @@ from typing import Literal
     /train
         /anger
         /happy
-    /tst
+    /test
         /anger
         /happy
 /labels
     /train
         /anger
         /happy
-    /tst
+    /test
         /anger
         /happy
 
@@ -26,14 +26,14 @@ from typing import Literal
 
 /images
     /train
-    /tst
+    /test
 /labels
     /train
-    /tst
+    /test
 """
 
 DIR_LEVEL_1 = ("images", "labels")
-DIR_LEVEL_2 = ("train", "tst")
+DIR_LEVEL_2 = ("train", "test")
 
 def bbox_2_yolo(bbox, img_w, img_h):
   x, y, w, h = bbox[0], bbox[1], bbox[2], bbox[3]
@@ -48,7 +48,7 @@ def bbox_2_yolo(bbox, img_w, img_h):
   return centerx, centery, w, h
 
 
-def convert_anno(src_data_path:str, mode:Literal["train", "tst"]="train"):
+def convert_anno(src_data_path:str, mode:Literal["train", "test"]="train"):
   """
   Returns:
       { "image_id": [(image_name, category_id, yolobox)] }
@@ -89,7 +89,7 @@ def convert_anno(src_data_path:str, mode:Literal["train", "tst"]="train"):
   
   return anno_dict
 
-def write_yolo_annot_txt(src_data_path:str, dst_data_path:str, anno_dict:dict, mode:Literal["train", "tst"]="train"):
+def write_yolo_annot_txt(src_data_path:str, dst_data_path:str, anno_dict:dict, mode:Literal["train", "test"]="train"):
   for k, v in anno_dict.items():
     emotion, origin_file_name = v[0][0].split("/")
     # copy img
@@ -99,7 +99,8 @@ def write_yolo_annot_txt(src_data_path:str, dst_data_path:str, anno_dict:dict, m
     file_name = origin_file_name.split(".")[0] + ".txt"
     with open(f"{dst_data_path}/labels/{mode}/{file_name}", 'w', encoding='cp949') as f:
       for obj in v:
-        category_id = obj[1]
+        # category_id = obj[1]
+        category_id = 0 # detect face only
         box = ['{:.6f}'.format(x) for x in obj[2]]
         box = ' '.join(box)
         line = str(category_id) + ' ' + box
@@ -122,11 +123,11 @@ def main(cfg):
       makedirs(f"{dir_level1}/{level2}", exist_ok=True)
   
   train_anns = convert_anno(src_data_path, "train")
-  tst_anns = convert_anno(src_data_path, "tst")
+  test_anns = convert_anno(src_data_path, "test")
   
   # save annotation txt files
   write_yolo_annot_txt(src_data_path, dst_data_path, train_anns, "train")
-  write_yolo_annot_txt(src_data_path, dst_data_path, tst_anns, "tst")
+  write_yolo_annot_txt(src_data_path, dst_data_path, test_anns, "test")
   
 if __name__ == "__main__":
   parser = argparse.ArgumentParser()

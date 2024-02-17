@@ -11,7 +11,7 @@ from uuid import uuid4
 def dfs(
   content:dict={"name": "root", "content": {}}, parent_path:str="../data",
   filename_old_to_new:dict={}, change_folder_name:bool=False,
-  src_root_dir:str="/home/KDT-admin/work/selected_images", dst_root_dir:str="../data", mode:Literal["train", "tst"]="train"
+  src_root_dir:str="/home/KDT-admin/work/selected_images", dst_root_dir:str="../data", mode:Literal["train", "test"]="train"
 ):
   for dir in listdir(parent_path):
     uuid = str(uuid4())
@@ -39,7 +39,7 @@ def dfs(
         makedirs(new_dst_root_dir, exist_ok=True)
         dfs(content["content"][dir], new_path, filename_old_to_new, change_folder_name, src_root_dir, new_dst_root_dir, mode)
 
-def create_structure_dataset(src_root_dir:str, dst_root_dir:str, filename_history:str, mode:Literal["train", "tst"]="train"):
+def create_structure_dataset(src_root_dir:str, dst_root_dir:str, filename_history:str, mode:Literal["train", "test"]="train"):
   filename_old_to_new = {}
   new_coco_annot = None
     
@@ -67,11 +67,11 @@ def main(cfg):
     "root": {
       "images": {
         "train": {"name": f"{src_root_dir}/images/train", "content": {}},
-        "tst": {"name": f"{src_root_dir}/images/tst", "content": {}}
+        "test": {"name": f"{src_root_dir}/images/test", "content": {}}
       },
       "labels": {
         "train": {"name": f"{src_root_dir}/labels/train", "content": {}},
-        "tst": {"name": f"{src_root_dir}/labels/tst", "content": {}}
+        "test": {"name": f"{src_root_dir}/labels/test", "content": {}}
       },
     }
   }
@@ -80,12 +80,12 @@ def main(cfg):
   if exists(src_root_dir) and not isfile(src_root_dir):  
     if len(listdir(dst_root_dir)) != 0: shutil.rmtree(dst_root_dir)
     makedirs(f"{dst_root_dir}/images/train", exist_ok=True)
-    makedirs(f"{dst_root_dir}/images/tst", exist_ok=True)
+    makedirs(f"{dst_root_dir}/images/test", exist_ok=True)
     makedirs(f"{dst_root_dir}/labels/train", exist_ok=True)
-    makedirs(f"{dst_root_dir}/labels/tst", exist_ok=True)
+    makedirs(f"{dst_root_dir}/labels/test", exist_ok=True)
   
   create_structure_dataset(src_root_dir, dst_root_dir, filename_history, "train")
-  create_structure_dataset(src_root_dir, dst_root_dir, filename_history, "tst")
+  create_structure_dataset(src_root_dir, dst_root_dir, filename_history, "test")
   
   with open(f"{dst_root_dir}/filename_mapper.json", "w", encoding="cp949") as f:
     json.dump(filename_history, f)

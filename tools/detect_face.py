@@ -32,17 +32,17 @@ def detect_bbox_yolo(dir_option:tuple, source_root:str, save_cropped_dir:str=Non
         for emotion in emotions:
             sources = os.path.join(source_root, dir, emotion) + "/*.jpg"
             results = model(sources, stream=True) # YOLOv8 detection, return: predicted bbox, cropped image array
-            for result in results:
+            for i, result in enumerate(results):
                 head, tail = os.path.split(result.path)
-                pred_bbox_results[emotion]= {tail: { 
-                    "filename": os.path.join(head.split('/')[-1], tail), # head.split('/')[-2]: emotion, tail: filename,
-                    "bbox_xywh": result.boxes.xywh,  # Boxes object for bounding box outputs
-                    "bbox_xyxy": result.boxes.xyxy,  # Boxes object for cropping
-                    "orig_shape":  result.orig_shape, # original image shape
-                    "origin_array": result.orig_img, # original image array 
-                }}
+                # pred_bbox_results[emotion]= {tail: { 
+                #     "filename": os.path.join(head.split('/')[-1], tail), # head.split('/')[-2]: emotion, tail: filename,
+                #     "bbox_xywh": result.boxes.xywh,  # Boxes object for bounding box outputs
+                #     "bbox_xyxy": result.boxes.xyxy,  # Boxes object for cropping
+                #     "orig_shape":  result.orig_shape, # original image shape
+                #     "origin_array": result.orig_img, # original image array 
+                # }}
                 
-                if save_bbox_dir is not None:
+                if save_bbox_dir is not None and i < 20:  # 처음 20개에 대해서만 bbox 결과 이미지 저장
                     # bbox 결과 이미지 저장
                     save_path = os.path.join(save_bbox_dir, dir, emotion)
                     os.makedirs(save_path, exist_ok=True)
@@ -51,22 +51,21 @@ def detect_bbox_yolo(dir_option:tuple, source_root:str, save_cropped_dir:str=Non
                 if save_cropped_dir is not None:
                     # padding처리한 cropped 이미지 저장
                     cropped_img_array = crop_face_yolo(target_size, result.boxes.xyxy[0], result.orig_img, padding_option)
-                    pred_bbox_results[emotion][tail].update({"cropped_array": cropped_img_array.tolist()})
+                    # pred_bbox_results[emotion][tail].update({"cropped_array": cropped_img_array.tolist()})
                     save_path = os.path.join(save_cropped_dir, dir, emotion)
                     os.makedirs(save_path, exist_ok=True)
                     plt.imsave(os.path.join(save_path, tail), cropped_img_array)
 
-        all_pred_bbox_results[dir] = pred_bbox_results
-    
-    return all_pred_bbox_results
+    #     all_pred_bbox_results[dir] = pred_bbox_results
+    # return all_pred_bbox_results
 
-def convert_to_json_serializable(obj):
-    if isinstance(obj, np.ndarray):
-        return obj.tolist()
-    elif torch.is_tensor(obj):
-        return obj.cpu().numpy().tolist()
-    else:
-        raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
+# def convert_to_json_serializable(obj):
+#     if isinstance(obj, np.ndarray):
+#         return obj.tolist()
+#     elif torch.is_tensor(obj):
+#         return obj.cpu().numpy().tolist()
+#     else:
+#         raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
 
 def main(cfg):
     dir_option = tuple(cfg.dir_option)
@@ -79,6 +78,8 @@ def main(cfg):
     padding_option = cfg.padding_option
     detect_results = detect_bbox_yolo(dir_option, src_data_path, dst_data_path, bbox_data_path, weights_path, target_size, padding_option)
     
+    # bbox 정보 저장하는 부분 주석 처리함.
+    # detect_results = detect_bbox_yolo(dir_option, src_data_path, dst_data_path, bbox_data_path, weights_path, target_size, padding_option)
     # with open(os.path.join(dst_data_path, "detect_info.json"), "w") as json_file:
     #     json.dumps(detect_results, indent=4, default=convert_to_json_serializable)
     # print(dir, ": finished!")

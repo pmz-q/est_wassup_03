@@ -70,7 +70,6 @@ def detect_bbox_yolo(dir_option:tuple, source_root:str, save_cropped_dir:str=Non
 
 def main(cfg):
     dir_option = tuple(cfg.dir_option)
-    print(dir_option)
     src_data_path = cfg.src_data_path
     dst_data_path = cfg.dst_data_path
     bbox_data_path = cfg.bbox_data_path
@@ -88,13 +87,13 @@ def main(cfg):
 if __name__ == "__main__":
   parser = argparse.ArgumentParser()
   
-  parser.add_argument("--dir-option", nargs="+", type=str, default=("train", "val", "test"), help="choose specific folders to detect&crop")
+  parser.add_argument("--dir-option", nargs="+", type=str, default=("train", "val", "test"), choices=["train", "val", "test"], help="choose specific folders to detect&crop")
   parser.add_argument("--src-data-path", type=str, default="../data/images", help="path where contains source images") 
   parser.add_argument("--dst-data-path", type=str, default="../cropped_data", help="destination path for cropped image") 
   parser.add_argument("--bbox-data-path", type=str, default=None, help="save original image with bbox printed") 
   parser.add_argument("--weights-path", type=str, default="/home/KDT-admin/work/weights/yolov8n-face.pt", help="pretrained weights path to load") 
   parser.add_argument("--target-size", nargs=2, type=int, default=(224, 224), help="target cropping image size, separated by space, example: 224 224")  
-  parser.add_argument("--padding-option", type=str, default="custom", choices=["custom", "yolo", "no_padding"], help="custom: resizing and add black pixels, yolo: no black pad, expand facial area to resize, no_padding: only crop, no resizing")
+  parser.add_argument("--padding-option", type=str, default=None, choices=["custom", "yolo"], help="custom: resizing and add black pixels, yolo: no black pad, expand facial area to resize, no_padding: only crop, no resizing")
   config = parser.parse_args()
 
   main(config)

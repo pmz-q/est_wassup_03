@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from ultralytics.utils.plotting import save_one_box
 from PIL import Image
 
-def crop_face_yolo(target_size, bbox_xyxy, origin_array, padding_option:str="custom"):
+def crop_face_yolo(target_size, bbox_xyxy, origin_array, padding_option:str):
   """Crop face using bbox information
   Args:
     target_size  (int, int): (width, height) target size of cropped image,
@@ -12,7 +12,7 @@ def crop_face_yolo(target_size, bbox_xyxy, origin_array, padding_option:str="cus
     padding_option (str): 
       1) custom - PIL, add black pixels. 
       2) yolo - yolo padding - expand facial area
-      3) no_padding - only crop, no resizing (size will be different)
+      3) None - only crop, no resizing nor padding (size will be different)
   """
   if padding_option == "custom":  # custom padding with black pixels
     cropped_img_array = save_one_box(bbox_xyxy, origin_array, square=False, save=False)

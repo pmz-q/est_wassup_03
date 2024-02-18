@@ -1,0 +1,21 @@
+info:
+  project_name: project_1
+  model_name: yolo
+  model_task: detection
+  data_root_dir: features # est_wassup_03/features
+train:
+  epochs: 20
+  lr_scheduler: colslr # available lr scheduler = ['coslr', 'steplr'] # None if lr_scheduler is not wanted
+  lr_scheduler_params:
+    lrf: 0.00001
+  batch: 16
+  imgsz: 224
+  device: 0 # int for single gpu or tuple for multiple gpu usage. e.g. (0, 1, 2, 3) # if gpu is not available, use cpu or mps
+  optimizer: adamw # available optimizer = ['sgd', 'adam', 'adamw']
+  optimizer_params:
+    lr0: 0.001
+    weight_decay: 0.01  
+  pretrained: # pretrained weight if wanted
+  seed: 2024
+  dropout: 0.3 # 0.0 for no dropout
+  conf: # object detection confidence threshold

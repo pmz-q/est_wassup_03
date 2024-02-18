@@ -15,19 +15,20 @@ def detect_bbox_yolo(dir_option:tuple, source_root:str, save_cropped_dir:str=Non
         save_cropped_dir (str, optional): save cropped image directory. Defaults to None.
         weights_path (str): a path of pretrained weights to load 
         target_size (tuple, optional): (width, height) target size of cropped image. Defaults to (224,224).
-        custom_padding (bool, optional): if True: custom padding - PIL, add black pixels. if False: no padding, only crop (size will be different). Defaults to True.
-        yolo_padding (bool, optional): yolo padding - expand facial area. Defaults to False.
+        padding_option (str): 
+            1) custom - PIL, add black pixels. 
+            2) yolo - yolo padding - expand facial area
+            3) no_padding - only crop, no resizing (size will be different)
     Returns: 
         all_pred_bbox_results (dict): predicted bbox results for all directories
     """
-    
     # dirs = ["train", "val", "test"]
     dirs = dir_option
     model = YOLO(weights_path)
 
-    all_pred_bbox_results = {}
+    # all_pred_bbox_results = {}
     for dir in dirs:
-        pred_bbox_results = {}
+        # pred_bbox_results = {}
         emotions = os.listdir(os.path.join(source_root, dir))
         for emotion in emotions:
             sources = os.path.join(source_root, dir, emotion) + "/*.jpg"
@@ -76,15 +77,13 @@ def main(cfg):
     weights_path = cfg.weights_path
     target_size = tuple(cfg.target_size)
     padding_option = cfg.padding_option
-    detect_results = detect_bbox_yolo(dir_option, src_data_path, dst_data_path, bbox_data_path, weights_path, target_size, padding_option)
+    detect_bbox_yolo(dir_option, src_data_path, dst_data_path, bbox_data_path, weights_path, target_size, padding_option)
     
     # bbox 정보 저장하는 부분 주석 처리함.
     # detect_results = detect_bbox_yolo(dir_option, src_data_path, dst_data_path, bbox_data_path, weights_path, target_size, padding_option)
     # with open(os.path.join(dst_data_path, "detect_info.json"), "w") as json_file:
     #     json.dumps(detect_results, indent=4, default=convert_to_json_serializable)
     # print(dir, ": finished!")
-
-    
 
 if __name__ == "__main__":
   parser = argparse.ArgumentParser()

@@ -74,10 +74,24 @@ def convert_origin_to_coco(
       if change_img_name: continue
       else: img_filename = annot["filename"]
     
-    boxes = annot["annot_C"]["boxes"]
     img_id = len(coco_annot["images"]) + 1
+    boxes = None
     
-    assert boxes["maxX"] > boxes["minX"] and boxes["maxY"] > boxes["minY"], f"Box size error !: (xmin, ymin, xmax, ymax): {boxes['minX'], boxes['minY'], boxes['maxX'], boxes['maxY']}"
+    for annot_type in ["A", "B", "C"]:
+      try:
+        boxes = annot[f"annot_{annot_type}"]["boxes"]
+        assert boxes["maxX"] > boxes["minX"] and boxes["maxY"] > boxes["minY"], f"Box size error !: (xmin, ymin, xmax, ymax): {boxes['minX'], boxes['minY'], boxes['maxX'], boxes['maxY']}"
+      except:
+        boxes = None
+        continue
+      else:
+        break
+    
+    # when bbox errors, remove the image
+    if boxes == None:
+      os.remove(f"{img_root_dir}/{img_filename}")
+      continue
+    
     width = boxes["maxX"] - boxes["minX"]
     height = boxes["maxY"] - boxes["minY"]
     

@@ -62,7 +62,7 @@ def create_structure_dataset(src_root_dir:str, dst_root_dir:str, filename_histor
   # TODO: 데이터 폴더 구조에 따라서 수정해야 할 수 있음
   # 주의!!!!
   # 이거 개발할 땐 data/images/anger... data/labels/anger... 이런식의 구조에서 짬
-  with tqdm.tqdm(total=len(listdir(f"{src_root_dir}/labels")), desc="create coco annotations") as progress_bar:
+  with tqdm.tqdm(total=len(listdir(f"{src_root_dir}/labels/{mode}")), desc="create coco annotations") as progress_bar:
     for (root, dirs, files) in walk(f"{src_root_dir}/labels/{mode}"):
         if root == f"{src_root_dir}/labels/{mode}": continue
         for file in files:

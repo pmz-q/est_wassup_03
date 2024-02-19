@@ -49,12 +49,14 @@ def create_structure_dataset(src_root_dir:str, dst_root_dir:str, filename_histor
   
   # TODO: progress bar 코드 정리
   tqdm_len = 0
-  for e in listdir(f"{src_root_dir}/images"):
-    tqdm_len += len(listdir(f"{src_root_dir}/images/{e}"))
+  
+  print(f"counting files in {mode} directory...")
+  for e in listdir(f"{src_root_dir}/images/{mode}"):
+    tqdm_len += len(listdir(f"{src_root_dir}/images/{mode}"))
   
   with tqdm.tqdm(total=tqdm_len, desc="copy renamed images") as progress_bar:
     dfs(filename_history["root"]["images"][mode], f"{src_root_dir}/images/{mode}", filename_old_to_new, False, src_root_dir, f"{dst_root_dir}/images/{mode}", mode, progress_bar)
-  with tqdm.tqdm(total=len(listdir(f"{src_root_dir}/labels")), desc="copy renamed origin annotations") as progress_bar:
+  with tqdm.tqdm(total=len(listdir(f"{src_root_dir}/labels/{mode}")), desc="copy renamed origin annotations") as progress_bar:
     dfs(filename_history["root"]["labels"][mode], f"{src_root_dir}/labels/{mode}", filename_old_to_new, False, src_root_dir, f"{dst_root_dir}/labels/{mode}", mode, progress_bar)
 
   # TODO: 데이터 폴더 구조에 따라서 수정해야 할 수 있음

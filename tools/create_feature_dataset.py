@@ -92,9 +92,9 @@ def main(cfg):
   }
   
   makedirs(dst_root_dir, exist_ok=True)
+  print("getting ready...")
   if exists(src_root_dir) and not isfile(src_root_dir):  
     if len(listdir(dst_root_dir)) != 0:
-      print("getting ready...")
       shutil.rmtree(dst_root_dir)
     makedirs(f"{dst_root_dir}/images/train", exist_ok=True)
     makedirs(f"{dst_root_dir}/images/test", exist_ok=True)

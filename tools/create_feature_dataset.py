@@ -13,7 +13,7 @@ def dfs(
   content:dict={"name": "root", "content": {}}, parent_path:str="../data",
   filename_old_to_new:dict={}, change_folder_name:bool=False,
   src_root_dir:str="/home/KDT-admin/work/selected_images", dst_root_dir:str="../data", mode:Literal["train", "test"]="train",
-  progress_bar=tqdm.tqdm(total=len(100))
+  progress_bar=tqdm.tqdm(total=100)
 ):
   for dir in listdir(parent_path):
     uuid = str(uuid4())

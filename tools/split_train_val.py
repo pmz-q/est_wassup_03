@@ -109,17 +109,11 @@ def split_list_val_train(list_images: list, trn_ratio: float):
   val_images = list_images[middle:]
   return trn_images, val_images
 
-def process_per_emotion(src_root_dir:str, dst_root_dir:str, e:str, trn_ratio:float):
+def process_per_emotion(src_root_dir:str, dst_root_dir:str, e:str, trn_ratio:float, do_copy:bool, process_file_action:callable):
   """
   Returns:
       tuple: ( e_trn_images, e_val_images )
   """
-  process_file_action = move_file
-  do_copy = src_root_dir != dst_root_dir
-  if do_copy:
-    process_file_action = copy_file
-    shutil.rmtree(dst_root_dir, ignore_errors=True)
-  
   makedirs(f"{dst_root_dir}/images/train/{e}", exist_ok=True)
   makedirs(f"{dst_root_dir}/images/val/{e}", exist_ok=True)
   makedirs(f"{dst_root_dir}/labels/train/{e}", exist_ok=True)
@@ -205,15 +199,20 @@ def yolo_classification_split(src_root_dir: str, dst_root_dir: str, train_ratio:
   if not are same, this will copy images and labels to the dst_root_dir
   """
   emotions = listdir(f"{src_root_dir}/images/train")
-  
   val_annot = deepcopy(COCO_ANNOT)
   trn_annot = deepcopy(COCO_ANNOT)
   
   trn_images = []
   val_images = []
   
+  process_file_action = move_file
+  do_copy = src_root_dir != dst_root_dir
+  if do_copy:
+    process_file_action = copy_file
+    shutil.rmtree(dst_root_dir, ignore_errors=True)
+  
   for e in emotions:
-    e_trn_images, e_val_images = process_per_emotion(src_root_dir, dst_root_dir, e, train_ratio)
+    e_trn_images, e_val_images = process_per_emotion(src_root_dir, dst_root_dir, e, train_ratio, do_copy, process_file_action)
     trn_images.extend(e_trn_images)
     val_images.extend(e_val_images)
   
@@ -238,8 +237,14 @@ def coco_classification_split(src_root_dir: str, dst_root_dir: str, train_ratio:
   trn_images = []
   val_images = []
   
+  process_file_action = move_file
+  do_copy = src_root_dir != dst_root_dir
+  if do_copy:
+    shutil.rmtree(dst_root_dir, ignore_errors=True)
+    process_file_action = copy_file
+  
   for e in emotions:
-    e_trn_images, e_val_images = process_per_emotion(src_root_dir, dst_root_dir, e, train_ratio)
+    e_trn_images, e_val_images = process_per_emotion(src_root_dir, dst_root_dir, e, train_ratio, do_copy, process_file_action)
     trn_images.extend(e_trn_images)
     val_images.extend(e_val_images)
   
@@ -264,8 +269,14 @@ def coco_detection_split(src_root_dir: str, dst_root_dir: str, train_ratio:float
   trn_images = []
   val_images = []
   
+  process_file_action = move_file
+  do_copy = src_root_dir != dst_root_dir
+  if do_copy:
+    shutil.rmtree(dst_root_dir, ignore_errors=True)
+    process_file_action = copy_file
+  
   for e in emotions:
-    e_trn_images, e_val_images = process_per_emotion(src_root_dir, dst_root_dir, e, train_ratio)
+    e_trn_images, e_val_images = process_per_emotion(src_root_dir, dst_root_dir, e, train_ratio, do_copy, process_file_action)
     trn_images.extend(e_trn_images)
     val_images.extend(e_val_images)
   

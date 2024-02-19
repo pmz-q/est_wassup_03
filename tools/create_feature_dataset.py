@@ -52,7 +52,7 @@ def create_structure_dataset(src_root_dir:str, dst_root_dir:str, filename_histor
   
   print(f"counting files in {mode} directory...")
   for e in listdir(f"{src_root_dir}/images/{mode}"):
-    tqdm_len += len(listdir(f"{src_root_dir}/images/{mode}"))
+    tqdm_len += len(listdir(f"{src_root_dir}/images/{mode}/{e}"))
   
   with tqdm.tqdm(total=tqdm_len, desc="copy renamed images") as progress_bar:
     dfs(filename_history["root"]["images"][mode], f"{src_root_dir}/images/{mode}", filename_old_to_new, False, src_root_dir, f"{dst_root_dir}/images/{mode}", mode, progress_bar)

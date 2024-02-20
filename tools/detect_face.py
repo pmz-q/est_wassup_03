@@ -26,6 +26,7 @@ def detect_bbox_yolo(dir_option:tuple, source_root:str, save_cropped_dir:str=Non
     dirs = dir_option
     model = YOLO(weights_path)
 
+    failed_detect_files = [] # to save detection failed images (path)
     # all_pred_bbox_results = {}
     for dir in dirs:
         # pred_bbox_results = {}
@@ -45,18 +46,29 @@ def detect_bbox_yolo(dir_option:tuple, source_root:str, save_cropped_dir:str=Non
                 
                 if save_bbox_dir is not None and i < 20:  # 처음 20개에 대해서만 bbox 결과 이미지 저장
                     # bbox 결과 이미지 저장
-                    save_path = os.path.join(save_bbox_dir, dir, emotion)
-                    os.makedirs(save_path, exist_ok=True)
-                    result.save(filename=os.path.join(save_path, tail))
+                    if len(result.boxes.xyxy)==0: # error handling
+                        failed_detect_files.append(result.path)
+                        continue
+                    else:
+                        save_path = os.path.join(save_bbox_dir, dir, emotion)
+                        os.makedirs(save_path, exist_ok=True)
+                        result.save(filename=os.path.join(save_path, tail))
 
                 if save_cropped_dir is not None:
                     # padding처리한 cropped 이미지 저장
-                    cropped_img_array = crop_face_yolo(target_size, result.boxes.xyxy[0], result.orig_img, padding_option)
+                    if len(result.boxes.xyxy)==0: # error handling
+                        failed_detect_files.append(result.path)
+                        continue
+                    else:
+                        cropped_img_array = crop_face_yolo(target_size, result.boxes.xyxy[0], result.orig_img, padding_option)
+            
                     # pred_bbox_results[emotion][tail].update({"cropped_array": cropped_img_array.tolist()})
                     save_path = os.path.join(save_cropped_dir, dir, emotion)
                     os.makedirs(save_path, exist_ok=True)
                     plt.imsave(os.path.join(save_path, tail), cropped_img_array)
 
+    with open(os.path.join(save_cropped_dir, "failed_detect_files.json", "w")) as json_file: # save error case
+        json.dump(failed_detect_files, json_file)
     #     all_pred_bbox_results[dir] = pred_bbox_results
     # return all_pred_bbox_results
 
@@ -91,7 +103,7 @@ if __name__ == "__main__":
   parser.add_argument("--src-data-path", type=str, default="../data/images", help="path where contains source images") 
   parser.add_argument("--dst-data-path", type=str, default="../cropped_data", help="destination path for cropped image") 
   parser.add_argument("--bbox-data-path", type=str, default=None, help="save original image with bbox printed") 
-  parser.add_argument("--weights-path", type=str, default="/home/KDT-admin/work/weights/yolov8n-face.pt", help="pretrained weights path to load") 
+  parser.add_argument("--weights-path", type=str, help="pretrained weights path to load") 
   parser.add_argument("--target-size", nargs=2, type=int, default=(224, 224), help="target cropping image size, separated by space, example: 224 224")  
   parser.add_argument("--padding-option", type=str, default=None, choices=["custom", "yolo"], help="custom: resizing and add black pixels, yolo: no black pad, expand facial area to resize, no_padding: only crop, no resizing")
   config = parser.parse_args()

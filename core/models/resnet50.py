@@ -22,7 +22,6 @@ class ResNet50(nn.Module):
 
 		self.model = resnet50(weights=pretrained_weights)
 
-
 	def train(
 		self, train_img_path: str, val_img_path: str, train_ann_path: str, val_ann_path: str, epochs: int,
 		lr_scheduler: Type[LRScheduler], optimizer: Type[Optimizer], loss_fn: Callable,

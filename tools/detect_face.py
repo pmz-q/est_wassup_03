@@ -26,7 +26,7 @@ def detect_bbox_yolo(dir_option:tuple, source_root:str, save_cropped_dir:str=Non
     dirs = dir_option
     model = YOLO(weights_path)
 
-    failed_detect_files = [] # to save detectionf failed images (path)
+    failed_detect_files = [] # to save detection failed images (path)
     # all_pred_bbox_results = {}
     for dir in dirs:
         # pred_bbox_results = {}
@@ -67,6 +67,8 @@ def detect_bbox_yolo(dir_option:tuple, source_root:str, save_cropped_dir:str=Non
                     os.makedirs(save_path, exist_ok=True)
                     plt.imsave(os.path.join(save_path, tail), cropped_img_array)
 
+    with open(os.path.join(save_cropped_dir, "failed_detect_files.json", "w")) as json_file: # save error case
+        json.dump(failed_detect_files, json_file)
     #     all_pred_bbox_results[dir] = pred_bbox_results
     # return all_pred_bbox_results
 

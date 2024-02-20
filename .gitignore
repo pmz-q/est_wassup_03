@@ -4,6 +4,7 @@ data/*
 yolo_detection_data/*
 features/*
 results/*
+*.pt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

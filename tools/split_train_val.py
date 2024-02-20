@@ -155,7 +155,8 @@ def write_yolo_dataset_yaml(dst_root_dir: str):
       "test": "images/test",
       "names": {
         0: "face"
-      }
+      },
+      "kpt_shape": [2, 2]
     }, f)
 
 def copy_test_set(src_root_dir: str, dst_root_dir: str):

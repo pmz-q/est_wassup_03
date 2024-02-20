@@ -103,7 +103,7 @@ def write_yolo_annot_txt(src_data_path:str, dst_data_path:str, anno_dict:dict, m
         category_id = 0 # detect face only
         box = ['{:.6f}'.format(x) for x in obj[2]]
         box = ' '.join(box)
-        line = str(category_id) + ' ' + box
+        line = str(category_id) + ' ' + box + ' 0 0 0 0'
         f.write(line + '\n')
 
 def main(cfg):

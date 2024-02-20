@@ -33,7 +33,7 @@ if __name__ == '__main__':
   parser = argparse.ArgumentParser()
   
   parser.add_argument("-run", "--run-type", choices=["train", "inference", "eval"], default=["train"], nargs="+")
-  parser.add_argument("-type", "--config-type", choices=["yolo", "coco"], default="yolo", nargs=1)
+  parser.add_argument("-type", "--config-type", choices=["yolo", "coco"], default="yolo")
   parser.add_argument("-cfg", "--config-path", type=str, required=True)
   
   config = parser.parse_args()

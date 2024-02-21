@@ -23,6 +23,7 @@ def yolo_cls(
     seed=train_config.seed,
     plots=True,
     save=True,
+    batch=train_config.batch,
     workers=train_config.num_workers,
     dropout=train_config.dropout,
     optimizer=cfg.optimizer,
@@ -32,10 +33,10 @@ def yolo_cls(
   )  # train the model
 
 
-if __name__ == "__main__":
-  parser = argparse.ArgumentParser()
+# if __name__ == "__main__":
+#   parser = argparse.ArgumentParser()
   
-  parser.add_argument("--config-path", type=str, default="../configs/project_2_yolo.yaml")
+#   parser.add_argument("--config-path", type=str, default="../configs/project_2_yolo.yaml")
   
-  config = parser.parse_args()
-  yolo_cls(config)
+#   config = parser.parse_args()
+#   yolo_cls(config)

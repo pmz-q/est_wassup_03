@@ -94,7 +94,7 @@ class ModelConfig:
     self.project_name = info.project_name
     self.model_name = info.model_name
     self.model_task = info.model_task
-    self.data_root_path = f"{get_root_path()}/{info.data_root_dir}"
+    self.data_root_path = info.data_root_dir
     
     self._train_config = self._train_config_class(**config['train'])
     self._infer_config = self._infer_config_class(**config['infer'])

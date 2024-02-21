@@ -49,29 +49,26 @@ def detect_bbox_yolo(dir_option:tuple, source_root:str, save_cropped_dir:str=Non
                     if len(result.boxes.xyxy)==0: # error handling
                         failed_detect_files.append(result.path)
                         continue
-                    else:
-                        save_path = os.path.join(save_bbox_dir, dir, emotion)
-                        os.makedirs(save_path, exist_ok=True)
-                        result.save(filename=os.path.join(save_path, tail))
+                    save_path = os.path.join(save_bbox_dir, dir, emotion)
+                    os.makedirs(save_path, exist_ok=True)
+                    result.save(filename=os.path.join(save_path, tail))
 
                 if save_cropped_dir is not None:
                     # padding처리한 cropped 이미지 저장
                     if len(result.boxes.xyxy)==0: # error handling
                         failed_detect_files.append(result.path)
                         continue
-                    else:
-                        cropped_img_array = crop_face_yolo(target_size, result.boxes.xyxy[0], result.orig_img, padding_option)
+                    cropped_img_array = crop_face_yolo(target_size, result.boxes.xyxy[0], result.orig_img, padding_option)
             
                     # pred_bbox_results[emotion][tail].update({"cropped_array": cropped_img_array.tolist()})
                     save_path = os.path.join(save_cropped_dir, dir, emotion)
                     os.makedirs(save_path, exist_ok=True)
                     plt.imsave(os.path.join(save_path, tail), cropped_img_array)
 
-    with open(os.path.join(save_cropped_dir, "failed_detect_files.json", "w")) as json_file: # save error case
+    with open(os.path.join(save_cropped_dir, "failed_detect_files.json"), "w") as json_file: # save error case
         json.dump(failed_detect_files, json_file)
     #     all_pred_bbox_results[dir] = pred_bbox_results
     # return all_pred_bbox_results
-
 # def convert_to_json_serializable(obj):
 #     if isinstance(obj, np.ndarray):
 #         return obj.tolist()

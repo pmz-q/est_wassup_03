@@ -1,4 +1,3 @@
-import argparse
 from copy import deepcopy
 # import cv2
 from datetime import datetime
@@ -7,7 +6,6 @@ import os
 from os import walk
 from os.path import isfile, exists
 from PIL import Image
-import sys
 
 
 COCO_ANNOT = {

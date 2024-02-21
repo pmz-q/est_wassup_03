@@ -151,16 +151,18 @@ def coco_annotation_split(src_root_path:str, trn_images:list, val_images:list, v
       continue
     
     img = {**img, "width": img_width, "height": img_height}
-    ann = coco_annot.imgToAnns[img_id]
+    anns = coco_annot.imgToAnns[img_id]
     img_name_only = img["file_name"].split("/")[1]
     if img_name_only in val_images:
       val_images.remove(img_name_only)
       val_annot["images"].append(img)
-      val_annot["annotations"].append(ann)
+      for ann in anns:
+        val_annot["annotations"].append(ann)
     else:
       trn_images.remove(img_name_only)
       trn_annot["images"].append(img)
-      trn_annot["annotations"].append(ann)
+      for ann in anns:
+        trn_annot["annotations"].append(ann)
   print("FileNotFound Count:", cnt)
   print("Train Count: ", len(trn_annot["images"]))
   print("Validation Count: ", len(val_annot["images"]))

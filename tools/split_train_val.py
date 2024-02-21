@@ -4,9 +4,11 @@ import json
 from os import listdir, makedirs
 from os.path import exists
 from os.path import abspath
+from PIL import Image
 from pycocotools.coco import COCO
 import random
 import shutil
+from tqdm import tqdm
 from typing import Literal
 import yaml
 
@@ -121,19 +123,34 @@ def process_per_emotion(src_root_dir:str, dst_root_dir:str, e:str, trn_ratio:flo
   
   e_images = listdir(f"{src_root_dir}/images/train/{e}")
   e_trn_images, e_val_images = split_list_val_train(e_images, trn_ratio)
-  for img in e_trn_images:
+  for img in tqdm(e_trn_images, desc=f"Process train [{e}]"):
     if not do_copy: break
     process_file_action(src_root_dir, dst_root_dir, f"{e}/{img}", "train", do_for_label=False)
-  for img in e_val_images:
+  for img in tqdm(e_val_images, desc=f"Process val [{e}]"):
     process_file_action(src_root_dir, dst_root_dir, f"{e}/{img}", "val", do_for_label=False)
 
   return e_trn_images, e_val_images
 
-def coco_annotation_split(annot_path:str, trn_images:list, val_images:list, val_annot:dict, trn_annot:dict):
+def coco_annotation_split(src_root_path:str, trn_images:list, val_images:list, val_annot:dict, trn_annot:dict):
+  annot_path = f"{src_root_path}/labels/train/annotation.json"
+  img_root_dir = f"{src_root_path}/images/train"
   coco_annot = COCO(annot_path)
   
+  cnt = 0
   for img_id in coco_annot.getImgIds():
     img = coco_annot.imgs[img_id]
+    
+    # update image size in case it's been cropped
+    try:
+      # detect-face 에서 drop 되는 이미지들 존재,
+      # 혹은 다른 이유로 찾지 못하는 이미지들 존재,
+      # annotation 에 추가하지 않습니다.
+      img_width, img_height = Image.open(f"{img_root_dir}/{img['file_name']}").size
+    except FileNotFoundError:
+      cnt += 1
+      continue
+    
+    img = {**img, "width": img_width, "height": img_height}
     ann = coco_annot.imgToAnns[img_id]
     img_name_only = img["file_name"].split("/")[1]
     if img_name_only in val_images:
@@ -144,6 +161,9 @@ def coco_annotation_split(annot_path:str, trn_images:list, val_images:list, val_
       trn_images.remove(img_name_only)
       trn_annot["images"].append(img)
       trn_annot["annotations"].append(ann)
+  print("FileNotFound Count:", cnt)
+  print("Train Count: ", len(trn_annot["images"]))
+  print("Validation Count: ", len(val_annot["images"]))
 
 def write_yolo_dataset_yaml(dst_root_dir: str):
   dst_root_abs = abspath(dst_root_dir)
@@ -173,6 +193,7 @@ def yolo_detection_split(src_root_dir: str, dst_root_dir: str, train_ratio:float
   this will reformat the source root dir if src_root_dir == dst_root_dir
   if not are same, this will copy images and labels to the dst_root_dir
   """
+  print("In progress...")
   process_file_action = move_file
   do_copy = src_root_dir != dst_root_dir
   if do_copy:
@@ -217,7 +238,7 @@ def yolo_classification_split(src_root_dir: str, dst_root_dir: str, train_ratio:
     trn_images.extend(e_trn_images)
     val_images.extend(e_val_images)
   
-  coco_annotation_split(f"{src_root_dir}/labels/train/annotation.json", trn_images, val_images, val_annot, trn_annot)
+  coco_annotation_split(src_root_dir, trn_images, val_images, val_annot, trn_annot)
   
   with open(f"{dst_root_dir}/labels/train/annotation.json", "w", encoding="cp949") as f:
     json.dump(trn_annot, f)
@@ -249,7 +270,7 @@ def coco_classification_split(src_root_dir: str, dst_root_dir: str, train_ratio:
     trn_images.extend(e_trn_images)
     val_images.extend(e_val_images)
   
-  coco_annotation_split(f"{src_root_dir}/labels/train/annotation.json", trn_images, val_images, val_annot, trn_annot)
+  coco_annotation_split(src_root_dir, trn_images, val_images, val_annot, trn_annot)
   
   with open(f"{dst_root_dir}/labels/train/annotation.json", "w", encoding="cp949") as f:
     json.dump(trn_annot, f)
@@ -281,7 +302,7 @@ def coco_detection_split(src_root_dir: str, dst_root_dir: str, train_ratio:float
     trn_images.extend(e_trn_images)
     val_images.extend(e_val_images)
   
-  coco_annotation_split(f"{src_root_dir}/labels/train/annotation.json", trn_images, val_images, val_annot, trn_annot)
+  coco_annotation_split(src_root_dir, trn_images, val_images, val_annot, trn_annot)
   
   with open(f"{dst_root_dir}/labels/train/annotation.json", "w", encoding="cp949") as f:
     json.dump(trn_annot, f)
@@ -290,8 +311,8 @@ def coco_detection_split(src_root_dir: str, dst_root_dir: str, train_ratio:float
     json.dump(val_annot, f)
 
 def main(cfg):
-  annot_format = cfg.annot_format[0]
-  task = cfg.task[0]
+  annot_format = cfg.annot_format
+  task = cfg.task
   train_ratio = cfg.train_ratio
   src_root_dir = cfg.src_root_path
   dst_root_dir = cfg.dst_root_path 
@@ -307,7 +328,9 @@ def main(cfg):
     }
   }
   
+  print("Getting ready...")
   splitter_map[task][annot_format](src_root_dir, dst_root_dir, train_ratio)
+  print("Start: Copy test-set to dst-root-dir")
   copy_test_set(src_root_dir, dst_root_dir)
 
 if __name__ == "__main__":
@@ -316,8 +339,8 @@ if __name__ == "__main__":
   # 주의!!!!!
   # split 하려는 src 폴더 포맷이 annot-format, task 와 같은지 확인하십시오!!!!
   # Make sure there are two folders in the src-root-path: images & labels
-  parser.add_argument("--annot-format", choices=["coco", "yolo"], nargs=1, default="coco")
-  parser.add_argument("--task", choices=["classification", "detection"], nargs=1, default="classification")
+  parser.add_argument("--annot-format", choices=["coco", "yolo"], default="coco")
+  parser.add_argument("--task", choices=["classification", "detection"], default="classification")
   parser.add_argument("--src-root-path", type=str, default="../data")
   parser.add_argument("--dst-root-path", type=str, default="../features")
   parser.add_argument("--train-ratio", type=float, default=0.8)

@@ -1,14 +1,14 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field, asdict
 from os import makedirs, listdir
 from os.path import exists, isfile
 import torch
-from torch.nn.functional import cross_entropy
+from torch.nn import CrossEntropyLoss
 from torch.optim.lr_scheduler import CosineAnnealingLR, StepLR, LRScheduler
 from torch.optim.optimizer import Optimizer
 from torch.optim.sgd import SGD
 from torch.optim.adam import Adam
 from torch.optim.adamw import AdamW
-from typing import Optional, Union, Literal, Type, Callable
+from typing import Optional, Union, Literal, Type, Callable, List
 from ..utils import get_root_path
 import yaml
 
@@ -25,7 +25,7 @@ OPTIMIZER_MAPPER = {
 }
 
 LOSS_FN_MAPPER = {
-  "cross_entropy": cross_entropy
+  "cross_entropy": CrossEntropyLoss()
 }
 
 @dataclass
@@ -38,20 +38,30 @@ class ConfigInfo:
 @dataclass
 class TrainConfig:
   epochs: int
-  lr_scheduler: Optional[Literal["coslr", "steplr"]]
-  lr_scheduler_params: Optional[dict]
   batch: int
   # TODO: img size train 에 추가하기
   imgsz: int
   device: Union[int, tuple]
   optimizer: Literal["adamw", "adam", "sgd"]
   optimizer_params: dict
-  pretrained: Optional[str]
   seed: int
   dropout: float
-  conf: Optional[float]
-  loss_fn: Callable=cross_entropy
+  loss_fn: Callable
+  lr_scheduler: Optional[Literal["coslr", "steplr"]]=None
+  lr_scheduler_params: Optional[dict]=None
+  pretrained: Optional[str]=None
+  conf: Optional[float]=None
   num_workers: Optional[int]=4
+
+@dataclass
+class InferConfig:
+  dir_option: List[Literal["train", "val", "test"]]
+  src_data_path: str="../data/images"
+  dst_data_path: str="../featues"
+  bbox_data_path: str=None
+  weights_path: str="/home/KDT-admin/work/weights/yolov8n-face.pt"
+  target_size: List[int]=field(default_factory=lambda:[224, 224])
+  padding_option: Literal["custom", "yolo"]="custom"
 
 class ModelConfig:
   def __init__(
@@ -65,10 +75,11 @@ class ModelConfig:
     
     self._optimizer: Type[Optimizer] = None
     self._lr_scheduler: Type[LRScheduler] = None
-    self._loss_fn: Callable = None
     
-    self._config_class: object = TrainConfig
+    self._train_config_class: object = TrainConfig
+    self._infer_config_class: object = InferConfig
     self._train_config: TrainConfig = None
+    self._infer_config: InferConfig = None
     
     self.config_path = config_path
   
@@ -85,7 +96,8 @@ class ModelConfig:
     self.model_task = info.model_task
     self.data_root_path = f"{get_root_path()}/{info.data_root_dir}"
     
-    self._train_config = self._config_class(**config['train'])
+    self._train_config = self._train_config_class(**config['train'])
+    self._infer_config = self._infer_config_class(**config['infer'])
   
   def valid_data_root_path(self):
     if not exists(self.data_root_path) or isfile(self.data_root_path):
@@ -101,9 +113,9 @@ class ModelConfig:
   def init_project_dirs(self):
     root_dir = get_root_path()
     results_dir = f"{root_dir}/results"
-    makedirs(f"{results_dir}/{self.project_name}/inference", exist_ok=True)
-    makedirs(f"{results_dir}/{self.project_name}/train", exist_ok=True)
-    makedirs(f"{results_dir}/{self.project_name}/eval_test", exist_ok=True)
+    makedirs(f"{results_dir}/{self.model_task}/{self.project_name}/inference", exist_ok=True)
+    makedirs(f"{results_dir}/{self.model_task}/{self.project_name}/train", exist_ok=True)
+    makedirs(f"{results_dir}/{self.model_task}/{self.project_name}/eval_test", exist_ok=True)
   
   @property
   def device(self) -> str:
@@ -114,7 +126,7 @@ class ModelConfig:
       else:
         return f"cuda:{','.join(device)}"
     else:
-      return torch.device("mps") if torch.backends.mps.is_available() else torch.device("cpu")
+      return "mps" if torch.backends.mps.is_available() else "cpu"
   
   @property
   def train_config(self):
@@ -122,24 +134,15 @@ class ModelConfig:
   
   @property
   def optimizer(self):
-    if self._optimizer == None:
-      self._optimizer = OPTIMIZER_MAPPER[self.train_config.optimizer](**self.train_config.optimizer_params)
-    return self._optimizer
+    return OPTIMIZER_MAPPER[self.train_config.optimizer]
   
   @property
   def lr_scheduler(self):
-    if self._lr_scheduler == None:
-      self._lr_scheduler = LR_SCHEDULER_MAPPER[self.train_config.lr_scheduler](
-        optimizer=self.optimizer,
-        **self.train_config.lr_scheduler_params
-      )
-    return self._lr_scheduler
+    return LR_SCHEDULER_MAPPER[self.train_config.lr_scheduler]
   
   @property
   def loss_fn(self):
-    if self._loss_fn == None:
-      self._loss_fn = self.train_config.loss_fn
-    return self._loss_fn
+    return LOSS_FN_MAPPER[self.train_config.loss_fn]
   
   def get_ann_file_path(self, mode: Literal["train", "val", "test"]):
     return f"{self.data_root_path}/labels/{mode}/annotation.json"
@@ -153,17 +156,27 @@ class ModelConfig:
     """
     est_wassup_03/
       results/
-        project_name/
-          inference/
-            1/
-            2/
-          train/
-          eval/
+        task_name/
+          project_name/
+            inference/
+              1/
+              2/
+            train/
+            eval/
     Returns:
       ( yolo_project_name, yolo_name )
     """
     num = 1
-    project_name = f"{get_root_path()}/results/{self.project_name}/{run_type}"
+    project_name = f"{get_root_path()}/results/{self.model_task}/{self.project_name}/{run_type}"
     while exists(f"{project_name}/{num}"):
       num += 1
     return project_name, f"{project_name}/{num}"
+  
+  def dict(self):
+    return {
+      **self.__dict__,
+      "_infer_config": asdict(self._infer_config),
+      "_train_config": asdict(self._train_config),
+      "_infer_config_class": None,
+      "_train_config_class": None
+    }

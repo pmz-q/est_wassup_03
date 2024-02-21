@@ -4,6 +4,7 @@ data/*
 yolo_detection_data/*
 features/*
 results/*
+cropped_data/*
 *.pt
 
 # Byte-compiled / optimized / DLL files

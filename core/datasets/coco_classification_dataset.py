@@ -2,15 +2,15 @@ import os.path
 from PIL import Image
 from pycocotools.coco import COCO
 from torchvision.datasets import VisionDataset
+from torchvision import transforms
 from typing import Optional, Callable, List, Any, Tuple
-
 
 class CocoClassificationDataset(VisionDataset):
   def __init__(
     self,
     src_root_path: str,
     ann_path: str,
-    transform: Optional[Callable]
+    transform: Optional[Callable]=None
   ):
     """
     Args:
@@ -20,19 +20,26 @@ class CocoClassificationDataset(VisionDataset):
           and returns a transformed version. E.g, ``transforms.PILToTensor``
     """
     super().__init__(src_root_path, transform=transform)
-    
+    self.transforms = transforms.Compose([
+      # transforms.Resize((224 , 224)),
+      transforms.ToTensor()
+    ])
+        
     self.coco = COCO(ann_path)
     self.ids = list(sorted(self.coco.imgs.keys()))
 
   def _load_image(self, id: int) -> Image.Image:
     path = self.coco.loadImgs(id)[0]["file_name"]
-    return Image.open(os.path.join(self.root, path)).convert("RGB")
+    return self.transforms(Image.open(os.path.join(self.root, path)).convert("RGB"))
 
   def _load_target(self, id: int) -> List[Any]:
     """
     assumes one annotation per one image
     """
     return self.coco.loadAnns(self.coco.getAnnIds(id))[0]
+  
+  # def _load_target(self, id: int) -> List[Any]:
+  #       return self.coco.loadAnns(self.coco.getAnnIds(id))
 
   def __getitem__(self, index: int) -> Tuple[Any, Any]:
     """
@@ -42,11 +49,8 @@ class CocoClassificationDataset(VisionDataset):
     id = self.ids[index]
     image = self._load_image(id)
     target = self._load_target(id)
-
-    if self.transform != None:
-      image = self.transform(image)
     
-    return image, target['category_id']
+    return image, target["category_id"]
 
   def __len__(self) -> int:
         return len(self.ids)

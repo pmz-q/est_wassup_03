@@ -8,7 +8,10 @@ from train_tools import (
 )
 from infer_tools import (
   yolo_det as infer_yolo_det,
-  yolo_cls as infer_yolo_cls
+  yolo_cls as infer_yolo_cls,
+  resnet50_cls as infer_resnet50_cls,
+  resnet101_cls as infer_resnet101_cls,
+  resnet152_cls as infer_resnet152_cls,
 )
 from typing import Dict, Type
 
@@ -40,7 +43,10 @@ def main(cfg):
       "yolo": infer_yolo_det
     },
     "classification": {
-      "yolo": infer_yolo_cls
+      "yolo": infer_yolo_cls,
+      "resnet50": infer_resnet50_cls,
+      "resnet101": infer_resnet101_cls,
+      "resnet152": infer_resnet152_cls,
     }
   }
   

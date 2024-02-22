@@ -7,7 +7,8 @@ import matplotlib.pyplot as plt
 from crop_face import crop_face_yolo
 from ultralytics import YOLO
 
-def detect_bbox_yolo(dir_option:tuple, source_root:str, save_cropped_dir:str=None, save_bbox_dir:str=None, weights_path:str=None, target_size:tuple=(224,224), padding_option:str="custom"):
+def detect_bbox_yolo(dir_option:tuple, source_root:str, save_cropped_dir:str=None, save_bbox_dir:str=None, 
+                     weights_path:str=None, target_size:tuple=(224,224), padding_option:str="custom", padding_scale:float=0.8):
     """Detect face using yolov8 pretrained, save predicted bbox information
     Args:
         source_root (str): source directory
@@ -19,6 +20,7 @@ def detect_bbox_yolo(dir_option:tuple, source_root:str, save_cropped_dir:str=Non
             1) custom - PIL, add black pixels. 
             2) yolo - yolo padding - expand facial area
             3) no_padding - only crop, no resizing (size will be different)
+        padding_scale (int): default = 0.8, recommend 0.7 for landmark detection
     Returns: 
         all_pred_bbox_results (dict): predicted bbox results for all directories
     """
@@ -58,7 +60,7 @@ def detect_bbox_yolo(dir_option:tuple, source_root:str, save_cropped_dir:str=Non
                     if len(result.boxes.xyxy)==0: # error handling
                         failed_detect_files.append(result.path)
                         continue
-                    cropped_img_array = crop_face_yolo(target_size, result.boxes.xyxy[0], result.orig_img, padding_option)
+                    cropped_img_array = crop_face_yolo(target_size, result.boxes.xyxy[0], result.orig_img, padding_option, padding_scale)
             
                     # pred_bbox_results[emotion][tail].update({"cropped_array": cropped_img_array.tolist()})
                     save_path = os.path.join(save_cropped_dir, dir, emotion)
@@ -85,7 +87,8 @@ def main(cfg):
     weights_path = cfg.weights_path
     target_size = tuple(cfg.target_size)
     padding_option = cfg.padding_option
-    detect_bbox_yolo(dir_option, src_data_path, dst_data_path, bbox_data_path, weights_path, target_size, padding_option)
+    padding_scale = cfg.padding_scale
+    detect_bbox_yolo(dir_option, src_data_path, dst_data_path, bbox_data_path, weights_path, target_size, padding_option, padding_scale)
     
     # bbox 정보 저장하는 부분 주석 처리함.
     # detect_results = detect_bbox_yolo(dir_option, src_data_path, dst_data_path, bbox_data_path, weights_path, target_size, padding_option)
@@ -103,6 +106,7 @@ if __name__ == "__main__":
   parser.add_argument("--weights-path", type=str, help="pretrained weights path to load") 
   parser.add_argument("--target-size", nargs=2, type=int, default=(224, 224), help="target cropping image size, separated by space, example: 224 224")  
   parser.add_argument("--padding-option", type=str, default=None, choices=["custom", "yolo"], help="custom: resizing and add black pixels, yolo: no black pad, expand facial area to resize, no_padding: only crop, no resizing")
+  parser.add_argument("--padding-scale", type=float, default=0.8, help="recommend 0.7 for expanding padding area")
   config = parser.parse_args()
 
   main(config)

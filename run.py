@@ -8,7 +8,8 @@ from train_tools import (
 )
 from infer_tools import (
   yolo_det as infer_yolo_det,
-  yolo_cls as infer_yolo_cls
+  yolo_cls as infer_yolo_cls,
+  dlib_det as infer_dlib_det
 )
 from typing import Dict, Type
 
@@ -40,7 +41,8 @@ def main(cfg):
       "yolo": infer_yolo_det
     },
     "classification": {
-      "yolo": infer_yolo_cls
+      "yolo": infer_yolo_cls,
+      "dlib": infer_dlib_det
     }
   }
   
@@ -49,7 +51,7 @@ def main(cfg):
     train_mapper[config.model_task][config.model_name](config)
   
   if "infer" in run_type:
-    infer_mapper[config.model_task][config.model_name](config)
+    infer_mapper[config.model_task][config.infer_config.infer_type](config)
 
 
 if __name__ == '__main__':

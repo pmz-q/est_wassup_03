@@ -14,3 +14,4 @@ ultralytics
 tensorboard
 scikit-learn
 tqdm
+dlib

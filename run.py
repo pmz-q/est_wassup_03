@@ -38,11 +38,11 @@ def main(cfg):
   
   infer_mapper: Dict[str, function] = {
     "detection": {
-      "yolo": infer_yolo_det
+      "yolo": infer_yolo_det,
+      "dlib": infer_dlib_det
     },
     "classification": {
       "yolo": infer_yolo_cls,
-      "dlib": infer_dlib_det
     }
   }
   

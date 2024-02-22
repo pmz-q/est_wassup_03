@@ -25,6 +25,7 @@ class YOLOTrainConfig:
   optimizer_params: dict
   seed: int
   dropout: float
+  loss_fn: Optional[str]=None
   lr_scheduler: Optional[Literal["coslr", "steplr"]]=None
   lr_scheduler_params: Optional[dict]=None
   pretrained: Optional[str]=None

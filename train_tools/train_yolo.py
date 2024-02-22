@@ -1,5 +1,6 @@
 import argparse
 from core.configs import YOLOConfig
+from os.path import exists
 import ultralytics
 from ultralytics import YOLO
 
@@ -7,6 +8,9 @@ from ultralytics import YOLO
 def yolo_det(
   cfg: YOLOConfig
 ):
+  if not exists(cfg.data_yaml_path):
+    raise FileNotFoundError(f"For training model [yolo] task [detection], data root directory must contain [yolo-dataset.yaml]")
+  
   ultralytics.checks()
   train_config = cfg.train_config
   if train_config.pretrained == None:

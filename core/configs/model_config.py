@@ -55,13 +55,8 @@ class TrainConfig:
 
 @dataclass
 class InferConfig:
-  dir_option: List[Literal["train", "val", "test"]]
-  src_data_path: str="../data/images"
-  dst_data_path: str="../featues"
-  bbox_data_path: str=None
-  weights_path: str="/home/KDT-admin/work/weights/yolov8n-face.pt"
-  target_size: List[int]=field(default_factory=lambda:[224, 224])
-  padding_option: Literal["custom", "yolo"]="custom"
+  src_dir: str
+  pretrained: str
 
 class ModelConfig:
   def __init__(
@@ -106,9 +101,6 @@ class ModelConfig:
     listdir_data_root = listdir(self.data_root_path)
     if "images" not in listdir_data_root or "labels" not in listdir_data_root:
       raise FileNotFoundError(f"Data root directory must contain both [images] and [labels] directories.")
-    
-    if self.model_name == "yolo" and self.model_task == "detection" and "yolo-dataset.yaml" not in listdir_data_root:
-      raise FileNotFoundError(f"For running model [yolo] task [detection], data root directory must contain [yolo-dataset.yaml]")
   
   def init_project_dirs(self):
     root_dir = get_root_path()
@@ -131,6 +123,10 @@ class ModelConfig:
   @property
   def train_config(self):
     return self._train_config
+  
+  @property
+  def infer_config(self):
+    return self._infer_config
   
   @property
   def optimizer(self):

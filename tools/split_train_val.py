@@ -222,7 +222,7 @@ def copy_test_set(src_root_dir: str, dst_root_dir: str):
       tst_annot["annotations"].append(ann)
   
   print("FileNotFound Count:", cnt)
-  with open(f"{dst_labels_test}/annotation.json", "w") as f:
+  with open(f"{dst_labels_test}/annotation.json", "w", encoding="cp949") as f:
     json.dump(tst_annot, f)
 
 def yolo_detection_split(src_root_dir: str, dst_root_dir: str, train_ratio:float):

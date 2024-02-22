@@ -36,7 +36,7 @@ def resnet50_cls(cfg: Resnet50Config):
     device=cfg.device
   )
 
-  with open(f"{tensorboard_name}/configs.json", "w") as f:
+  with open(f"{tensorboard_name}/configs.json", "w", encoding="cp949") as f:
     json.dump(cfg.dict(), f)
   
   model.test(

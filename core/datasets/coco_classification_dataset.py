@@ -37,9 +37,6 @@ class CocoClassificationDataset(VisionDataset):
     assumes one annotation per one image
     """
     return self.coco.loadAnns(self.coco.getAnnIds(id))[0]
-  
-  # def _load_target(self, id: int) -> List[Any]:
-  #       return self.coco.loadAnns(self.coco.getAnnIds(id))
 
   def __getitem__(self, index: int) -> Tuple[Any, Any]:
     """

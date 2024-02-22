@@ -1,8 +1,17 @@
 import argparse
 from core.configs import YOLOConfig, ModelConfig, Resnet50Config
-from train_tools import yolo_det, yolo_cls, resnet50_cls
-from infer_tools import yolo_det as infer_yolo_det, yolo_cls as infer_yolo_cls
+from train_tools import (
+  yolo_det, yolo_cls,
+  resnet50_cls,
+  resnet101_cls,
+  resnet152_cls
+)
+from infer_tools import (
+  yolo_det as infer_yolo_det,
+  yolo_cls as infer_yolo_cls
+)
 from typing import Dict, Type
+
 
 def main(cfg):
   config_path = cfg.config_path
@@ -17,7 +26,9 @@ def main(cfg):
   train_mapper: Dict[str, function] = {
     "classification": {
       "yolo": yolo_cls,
-      "resnet50": resnet50_cls
+      "resnet50": resnet50_cls,
+      "resnet101": resnet101_cls,
+      "resnet152": resnet152_cls
     },
     "detection": {
       "yolo": yolo_det

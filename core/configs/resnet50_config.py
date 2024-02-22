@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from .model_config import ModelConfig
 
 
@@ -12,5 +13,5 @@ class Resnet50Config(ModelConfig):
   def load_configs(self):
     super().load_configs()
     if self.train_config.pretrained == None:
-      self.train_config.pretrained = 'IMAGENET1K_V2'
+      self.train_config.pretrained = 'DEFAULT'
   

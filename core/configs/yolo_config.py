@@ -18,24 +18,24 @@ class YOLOLRSchedulerParams:
 @dataclass
 class YOLOTrainConfig:
   epochs: int
-  lr_scheduler: Optional[Literal["coslr", "steplr"]]
-  lr_scheduler_params: Optional[dict]
   batch: int
   imgsz: int
   device: Union[int, str]
   optimizer: Literal["adamw", "adam", "sgd"]
   optimizer_params: dict
-  pretrained: Optional[str]
   seed: int
   dropout: float
-  conf: Optional[float]
-  cls: Optional[float]
-  num_workers: int=4
+  lr_scheduler: Optional[Literal["coslr", "steplr"]]=None
+  lr_scheduler_params: Optional[dict]=None
+  pretrained: Optional[str]=None
+  conf: Optional[float]=None
+  cls: Optional[float]=None
+  num_workers: Optional[int]=4
 
 class YOLOConfig(ModelConfig):
   def __init__(self, config_path: str):
     super().__init__(config_path)
-    self._config_class: object = YOLOTrainConfig
+    self._train_config_class: object = YOLOTrainConfig
     self._train_config: YOLOTrainConfig = None
     
     self.load_configs()

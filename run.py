@@ -1,5 +1,5 @@
 import argparse
-from core.configs import YOLOConfig, ModelConfig
+from core.configs import YOLOConfig, ModelConfig, Resnet50Config
 from train_tools import yolo_det, yolo_cls, resnet50_cls
 from typing import Dict, Type
 
@@ -10,7 +10,7 @@ def main(cfg):
   
   config_mapper:Dict[str, Type[ModelConfig]] = {
     "yolo": YOLOConfig,
-    "coco": ModelConfig
+    "coco": Resnet50Config
   }
   
   train_mapper: Dict[str, function] = {

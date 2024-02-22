@@ -5,7 +5,7 @@ info:
   data_root_dir: features # est_wassup_03/features
 train:
   epochs: 20
-  lr_scheduler: colslr # available lr scheduler = ['coslr', 'steplr'] # None if lr_scheduler is not wanted
+  lr_scheduler: coslr # available lr scheduler = ['coslr', 'steplr'] # None if lr_scheduler is not wanted
   lr_scheduler_params:
     lrf: 0.00001
   batch: 16
@@ -15,8 +15,15 @@ train:
   optimizer_params:
     lr0: 0.001
     weight_decay: 0.01  
-  pretrained: # pretrained weight if wanted
+  pretrained: results/project_3/train/4/weights/best.pt # pretrained weight if wanted
   seed: 2024
   dropout: 0.3 # 0.0 for no dropout
   conf: # object detection confidence threshold
   cls: 0.5 # 	Weight of the classification loss in the total loss function, affecting the importance of correct class prediction relative to other components.
+infer:
+  dir_option: ["train", "val", "test"]
+  src_data_path: data/images
+  bbox_data_path:
+  weights_path: "results/project_3/train/4/weights/best.pt"
+  target_size: [224, 224]
+  padding_option: "custom"

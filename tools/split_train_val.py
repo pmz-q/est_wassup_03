@@ -182,13 +182,48 @@ def write_yolo_dataset_yaml(dst_root_dir: str):
     }, f)
 
 def copy_test_set(src_root_dir: str, dst_root_dir: str):
+  dst_images_test = f"{dst_root_dir}/images/test"
+  dst_labels_test = f"{dst_root_dir}/labels/test"
   if src_root_dir != dst_root_dir:
-    dst_images_test = f"{dst_root_dir}/images/test"
-    dst_labels_test = f"{dst_root_dir}/labels/test"
     shutil.rmtree(dst_images_test, ignore_errors=True)
     shutil.rmtree(dst_labels_test, ignore_errors=True)
-    shutil.copytree(f"{src_root_dir}/images/test", dst_images_test)
-    shutil.copytree(f"{src_root_dir}/labels/test", dst_labels_test)
+    for e in ["happy", "anxiety", "pain", "sad", "anger", "embarrass", "normal"]:
+      makedirs(f"{dst_images_test}/{e}", exist_ok=True)
+      makedirs(f"{dst_labels_test}/{e}", exist_ok=True)
+    
+  
+  annot_path = f"{src_root_dir}/labels/test/annotation.json"
+  img_root_dir = f"{src_root_dir}/images/test"
+  coco_annot = COCO(annot_path)
+  
+  cnt = 0
+  tst_annot = deepcopy(COCO_ANNOT)
+  for img_id in coco_annot.getImgIds():
+    img = coco_annot.imgs[img_id]
+    
+    # update image size in case it's been cropped
+    try:
+      # detect-face 에서 drop 되는 이미지들 존재,
+      # 혹은 다른 이유로 찾지 못하는 이미지들 존재,
+      # annotation 에 추가하지 않습니다.
+      img_width, img_height = Image.open(f"{img_root_dir}/{img['file_name']}").size
+    except FileNotFoundError:
+      cnt += 1
+      continue
+    
+    if src_root_dir != dst_root_dir:
+      shutil.copy(f"{img_root_dir}/{img['file_name']}", f"{dst_images_test}/{img['file_name']}")
+    
+    img = {**img, "width": img_width, "height": img_height}
+    anns = coco_annot.imgToAnns[img_id]
+    
+    tst_annot["images"].append(img)
+    for ann in anns:
+      tst_annot["annotations"].append(ann)
+  
+  print("FileNotFound Count:", cnt)
+  with open(f"{dst_labels_test}/annotation.json", "w", encoding="cp949") as f:
+    json.dump(tst_annot, f)
 
 def yolo_detection_split(src_root_dir: str, dst_root_dir: str, train_ratio:float):
   """

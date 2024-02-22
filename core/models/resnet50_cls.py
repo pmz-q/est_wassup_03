@@ -67,7 +67,7 @@ class ResNet50Cls(nn.Module):
       if val_acc > best_acc:
         best_acc = val_acc
         best_model_wts = copy.deepcopy(self.model.state_dict())
-        torch.save(best_model_wts, f"{tensorboard_name}/best.pt")
+        torch.save(best_model_wts, f"{tensorboard_name}/resnet50_cls_best.pt")
       
       writer.add_scalar('Loss/Train', trn_loss, epoch)
       writer.add_scalar('Loss/Validation', val_loss, epoch)
@@ -78,6 +78,7 @@ class ResNet50Cls(nn.Module):
       pbar.set_postfix({'trn_loss': trn_loss, 'trn_acc': trn_acc, 'val_loss': val_loss, 'val_acc': val_acc})
       
     writer.close()
+    torch.save(self.model, f"{tensorboard_name}/resnet50_cls.pt")
   
   def test(
     self, tensorboard_name:str, test_img_path:str, test_ann_path:str, batch_size:int, num_workers:int, device: str, criterion: Callable
@@ -118,20 +119,21 @@ class ResNet50Cls(nn.Module):
     
     cm = confusion_matrix(list_y, list_pred, labels=categories, normalize="true")
     plt.figure(figsize=(20,15))
-    plt.title(f"Confusion Matrix Normalized - test acc: {epoch_acc}")
+    plt.rcParams.update({"font.size": 18})
+    plt.title(f"Confusion Matrix Normalized - TEST ACC: {epoch_acc}", fontdict={"size": 24})
     heatmap = sns.heatmap(cm, annot=True, fmt=".2f", cmap="Blues")
-    heatmap.yaxis.set_ticklabels(categories, rotation=0, ha="right",fontsize=15)
-    heatmap.xaxis.set_ticklabels(categories, rotation=45, ha="right",fontsize=15)
+    heatmap.yaxis.set_ticklabels(categories, rotation=0, ha="right", fontsize=18)
+    heatmap.xaxis.set_ticklabels(categories, rotation=45, ha="right", fontsize=18)
     plt.ylabel("True label")
     plt.xlabel("Predicted label")
     plt.savefig(f"{tensorboard_name}/confusion_matrix_normalized.png")
     
     cm = confusion_matrix(list_y, list_pred, labels=categories)
     plt.figure(figsize=(20,15))
-    plt.title(f"Confusion Matrix - test acc: {epoch_acc}")
+    plt.title(f"Confusion Matrix - TEST ACC: {epoch_acc}", fontdict={"size": 24})
     heatmap = sns.heatmap(cm, annot=True, fmt="d", cmap="Blues")
-    heatmap.yaxis.set_ticklabels(categories, rotation=0, ha="right",fontsize=15)
-    heatmap.xaxis.set_ticklabels(categories, rotation=45, ha="right",fontsize=15)
+    heatmap.yaxis.set_ticklabels(categories, rotation=0, ha="right", fontsize=18)
+    heatmap.xaxis.set_ticklabels(categories, rotation=45, ha="right", fontsize=18)
     plt.ylabel("True label")
     plt.xlabel("Predicted label")
     plt.savefig(f"{tensorboard_name}/confusion_matrix.png")

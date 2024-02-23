@@ -96,7 +96,7 @@ def dlib_det(
       y1 = face.top()
       x2 = face.right()
       y2 = face.bottom()
-      cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 3)
+      # cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 3)
       
       # Landmarks
       for n in range(0, 68):
@@ -104,7 +104,7 @@ def dlib_det(
         y = landmarks.part(n).y
         keypoints += [x, y, 2]  # COCO visibility flag '2' means visible
         # Draw a circle at each landmark point
-        cv2.circle(img, (x, y), 4, (255, 0, 0), -1)
+        cv2.circle(img, (x, y), 2, (255, 0, 0), -1)
 
       if save_coco != None and old_coco == None: # Assumes one face per image
         save_coco["images"].append({

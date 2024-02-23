@@ -1,8 +1,11 @@
 info:
   project_name: project_1
   model_name: resnet50
+  # model_name: resnet101
+  # model_name: resnet152
   model_task: classification
-  data_root_dir: /home/sdk/Work/est_projects/03-cv/est_wassup_03/features # est_wassup_03/features
+  # data_root_dir: /home/sdk/Work/est_projects/03-cv/est_wassup_03/features # est_wassup_03/features
+  data_root_dir: /home/KDT-admin/work/github/sdk/est_wassup_03/features
 train:
   epochs: 20
   lr_scheduler: coslr # available lr scheduler = ['coslr', 'steplr'] # None if lr_scheduler is not wanted
@@ -14,7 +17,7 @@ train:
     eta_min: 0.000001
   batch: 16
   imgsz: 224
-  device: 0 # int for single gpu or tuple for multiple gpu usage. e.g. (0, 1, 2, 3) # if gpu is not available, use cpu or mps
+  device: 3 # int for single gpu or tuple for multiple gpu usage. e.g. (0, 1, 2, 3) # if gpu is not available, use cpu or mps
   optimizer: adamw # available optimizer = ['sgd', 'adam', 'adamw']
   optimizer_params:
     lr: 0.001
@@ -25,5 +28,8 @@ train:
   conf: # object detection confidence threshold
   loss_fn: cross_entropy # ['cross_entropy']
 infer:
-  src_dir: /home/sdk/Work/est_projects/03-cv/est_wassup_03/infer_images
-  pretrained: /home/sdk/Work/est_projects/03-cv/est_wassup_03/yolo-cls-best.pt
+  # src_dir: /home/sdk/Work/est_projects/03-cv/est_wassup_03/infer_images
+  src_dir: /home/KDT-admin/work/github/sdk/est_wassup_03/test_infer
+  # pretrained: /home/sdk/Work/est_projects/03-cv/est_wassup_03/yolo-cls-best.pt
+  # pretrained: IMAGENET1K_V1  # Old resnet50, 101, 152
+  pretrained: IMAGENET1K_V2  # Latest resnet50, 101, 152

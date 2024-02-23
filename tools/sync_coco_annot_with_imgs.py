@@ -58,6 +58,7 @@ def sync_coco_annot_imgs(
     
     cnt = 0
     new_annot = deepcopy(COCO_ANNOT)
+    print(f"{mode} images detected:", coco_annot.getImgIds())
     for img_id in coco_annot.getImgIds():
       img = coco_annot.imgs[img_id]
       
@@ -74,7 +75,7 @@ def sync_coco_annot_imgs(
       for ann in anns:
         new_annot["annotations"].append(ann)
     
-    print("FileNotFound Count:", cnt)
+    print(f"{mode} file_not_found count:", cnt)
     with open(ann_path, "w", encoding="cp949") as f:
       json.dump(new_annot, f)
 

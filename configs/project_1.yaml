@@ -28,8 +28,6 @@ train:
   conf: # object detection confidence threshold
   loss_fn: cross_entropy # ['cross_entropy']
 infer:
-  # src_dir: /home/sdk/Work/est_projects/03-cv/est_wassup_03/infer_images
-  src_dir: /home/KDT-admin/work/github/sdk/est_wassup_03/test_infer
-  # pretrained: /home/sdk/Work/est_projects/03-cv/est_wassup_03/yolo-cls-best.pt
-  # pretrained: IMAGENET1K_V1  # Old resnet50, 101, 152
-  pretrained: IMAGENET1K_V2  # Latest resnet50, 101, 152
+  src_dir: /home/sdk/Work/est_projects/03-cv/est_wassup_03/features
+  pretrained: /home/sdk/Work/est_projects/03-cv/est_wassup_03/shape_predictor_68_face_landmarks.dat
+  infer_type: "dlib"

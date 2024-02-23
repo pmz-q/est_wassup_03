@@ -57,6 +57,7 @@ class TrainConfig:
 class InferConfig:
   src_dir: str
   pretrained: str
+  infer_type: str
 
 class ModelConfig:
   def __init__(

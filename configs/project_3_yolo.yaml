@@ -19,11 +19,8 @@ train:
   seed: 2024
   dropout: 0.3 # 0.0 for no dropout
   conf: # object detection confidence threshold
-  cls: 0.5 # 	Weight of the classification loss in the total loss function, affecting the importance of correct class prediction relative to other components.
+  loss_fn: cross_entropy # ['cross_entropy']
 infer:
-  dir_option: ["train", "val", "test"]
-  src_data_path: data/images
-  bbox_data_path:
-  weights_path: "results/project_3/train/4/weights/best.pt"
-  target_size: [224, 224]
-  padding_option: "custom"
+  src_dir: /home/sdk/Work/est_projects/03-cv/est_wassup_03/features
+  pretrained: /home/sdk/Work/est_projects/03-cv/est_wassup_03/shape_predictor_68_face_landmarks.dat
+  infer_type: "dlib"

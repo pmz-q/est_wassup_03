@@ -139,8 +139,8 @@ def dlib_det(
         progress_bar.set_postfix(score="{0:.2f}".format(scores[i]))
 
     # Save the image with landmarks
-    if idx < max_save_image:
-      cv2.imwrite(f"{dst_dir_path}/{emotion}/{img_name}", img)
+    # if idx < max_save_image:
+    cv2.imwrite(f"{dst_dir_path}/{emotion}/{img_name}", img)
     # flush cv2
     cv2.destroyAllWindows()
     progress_bar.update(1)

@@ -1,5 +1,6 @@
 import argparse
 import os
+import shutil
 import json
 import torch
 import numpy as np
@@ -24,17 +25,20 @@ def detect_bbox_yolo(dir_option:tuple, source_root:str, save_cropped_dir:str=Non
     Returns: 
         all_pred_bbox_results (dict): predicted bbox results for all directories
     """
-    # dirs = ["train", "val", "test"]
-    dirs = dir_option
+    images_root = source_root + "/images"
+    labels_root = source_root + "/labels"
+    images_dst = save_cropped_dir + "/images"
+    labels_dst = save_cropped_dir + "/labels"
+    dirs = dir_option  # ["train", "val", "test"]
     model = YOLO(weights_path)
 
     failed_detect_files = [] # to save detection failed images (path)
     # all_pred_bbox_results = {}
     for dir in dirs:
         # pred_bbox_results = {}
-        emotions = os.listdir(os.path.join(source_root, dir))
+        emotions = os.listdir(os.path.join(images_root, dir))
         for emotion in emotions:
-            sources = os.path.join(source_root, dir, emotion) + "/*.jpg"
+            sources = os.path.join(images_root, dir, emotion) + "/*.jpg"
             results = model(sources, stream=True) # YOLOv8 detection, return: predicted bbox, cropped image array
             for i, result in enumerate(results):
                 head, tail = os.path.split(result.path)
@@ -51,7 +55,7 @@ def detect_bbox_yolo(dir_option:tuple, source_root:str, save_cropped_dir:str=Non
                     if len(result.boxes.xyxy)==0: # error handling
                         failed_detect_files.append(result.path)
                         continue
-                    save_path = os.path.join(save_bbox_dir, dir, emotion)
+                    save_path = os.path.join(images_dst, dir, emotion)
                     os.makedirs(save_path, exist_ok=True)
                     result.save(filename=os.path.join(save_path, tail))
 
@@ -63,21 +67,18 @@ def detect_bbox_yolo(dir_option:tuple, source_root:str, save_cropped_dir:str=Non
                     cropped_img_array = crop_face_yolo(target_size, result.boxes.xyxy[0], result.orig_img, padding_option, padding_scale)
             
                     # pred_bbox_results[emotion][tail].update({"cropped_array": cropped_img_array.tolist()})
-                    save_path = os.path.join(save_cropped_dir, dir, emotion)
+                    save_path = os.path.join(images_dst, dir, emotion)
                     os.makedirs(save_path, exist_ok=True)
                     plt.imsave(os.path.join(save_path, tail), cropped_img_array)
+    
+    # label
+    shutil.copytree(labels_root, labels_dst)
 
     with open(os.path.join(save_cropped_dir, "failed_detect_files.json"), "w", encoding="cp949") as json_file: # save error case
         json.dump(failed_detect_files, json_file)
     #     all_pred_bbox_results[dir] = pred_bbox_results
     # return all_pred_bbox_results
-# def convert_to_json_serializable(obj):
-#     if isinstance(obj, np.ndarray):
-#         return obj.tolist()
-#     elif torch.is_tensor(obj):
-#         return obj.cpu().numpy().tolist()
-#     else:
-#         raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
+
 
 def main(cfg):
     dir_option = tuple(cfg.dir_option)
@@ -100,7 +101,7 @@ if __name__ == "__main__":
   parser = argparse.ArgumentParser()
   
   parser.add_argument("--dir-option", nargs="+", type=str, default=("train", "val", "test"), choices=["train", "val", "test"], help="choose specific folders to detect&crop")
-  parser.add_argument("--src-data-path", type=str, default="../data/images", help="path where contains source images") 
+  parser.add_argument("--src-data-path", type=str, default="../data", help="source directory contains both /images and /labels") 
   parser.add_argument("--dst-data-path", type=str, default="../cropped_data", help="destination path for cropped image") 
   parser.add_argument("--bbox-data-path", type=str, default=None, help="save original image with bbox printed") 
   parser.add_argument("--weights-path", type=str, help="pretrained weights path to load") 

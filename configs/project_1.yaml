@@ -31,3 +31,4 @@ infer:
   pretrained: /home/sdk/Work/est_projects/03-cv/est_wassup_03/shape_predictor_68_face_landmarks.dat
   infer_type: "dlib"
   infer_task: "detection"
+  save_mode: ["gray", "color", "heatmap"]

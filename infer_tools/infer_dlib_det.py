@@ -106,7 +106,7 @@ def dlib_det(
         # Draw a circle at each landmark point
         cv2.circle(img, (x, y), 2, (255, 0, 0), -1)
 
-      if save_coco != None and old_coco == None: # Assumes one face per image
+      # if save_coco != None and old_coco == None: # Assumes one face per image
         # save_coco["images"].append({
         #   "id": idx+1,
         #   "file_name": f"{emotion}{img_name}",
@@ -122,7 +122,7 @@ def dlib_det(
         #   "keypoints": keypoints,
         #   "num_keypoints": 68
         # })
-      elif save_coco != None and old_coco != None:
+      # elif save_coco != None and old_coco != None:
         # img_ids = old_coco.getImgIds()
         # img_infos = old_coco.loadImgs(img_ids)
         # for img_info in img_infos:

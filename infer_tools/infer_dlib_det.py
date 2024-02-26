@@ -85,7 +85,7 @@ def dlib_det(
     if len(faces) > 1: 
       print("detected more than one face!!")
       detected_more_than_one_face.append(img_name)
-      
+    
     for i, face in enumerate(faces):
       if i > 1: break # assume one face per image
       landmarks = predictor(gray, face)
@@ -151,6 +151,7 @@ def main(cfg:ModelConfig):
   
   print("Counting files ...")
   for mode in os.listdir(f"{cfg.infer_config.src_dir}/images"):
+    if os.path.isfile(f"{cfg.infer_config.src_dir}/images/{mode}"): continue
     coco_annotation = deepcopy(COCO_ANNOT)
     detected_more_than_one_face = []
     old_coco = COCO(f"{cfg.infer_config.src_dir}/labels/{mode}/annotation.json")

@@ -58,6 +58,7 @@ class InferConfig:
   src_dir: str
   pretrained: str
   infer_type: str
+  infer_task: str
 
 class ModelConfig:
   def __init__(

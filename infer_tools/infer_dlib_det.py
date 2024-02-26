@@ -107,33 +107,33 @@ def dlib_det(
         cv2.circle(img, (x, y), 2, (255, 0, 0), -1)
 
       if save_coco != None and old_coco == None: # Assumes one face per image
-        save_coco["images"].append({
-          "id": idx+1,
-          "file_name": f"{emotion}{img_name}",
-          "width": img.shape[1],
-          "height": img.shape[0]
-        })
+        # save_coco["images"].append({
+        #   "id": idx+1,
+        #   "file_name": f"{emotion}{img_name}",
+        #   "width": img.shape[1],
+        #   "height": img.shape[0]
+        # })
         
-        save_coco["annotations"].append({
-          "id": len(save_coco["annotations"]) + 1,
-          "image_id": idx+1,
-          "category_id": CAT_MAPPER[emotion],
-          "bbox": [face.left(), face.top(), face.right() - face.left(), face.bottom() - face.top()],
-          "keypoints": keypoints,
-          "num_keypoints": 68
-        })
+        # save_coco["annotations"].append({
+        #   "id": len(save_coco["annotations"]) + 1,
+        #   "image_id": idx+1,
+        #   "category_id": CAT_MAPPER[emotion],
+        #   "bbox": [face.left(), face.top(), face.right() - face.left(), face.bottom() - face.top()],
+        #   "keypoints": keypoints,
+        #   "num_keypoints": 68
+        # })
       elif save_coco != None and old_coco != None:
-        img_ids = old_coco.getImgIds()
-        img_infos = old_coco.loadImgs(img_ids)
-        for img_info in img_infos:
-          save_coco["images"].append(img_info)
-          if img_info["file_name"] == f"{emotion}/{img_name}":
-            ann = old_coco.imgToAnns[img_info["id"]][0]
-            save_coco["annotations"].append({
-                **ann,
-                "key_points": keypoints,
-                "num_keypoints": 68
-            })
+        # img_ids = old_coco.getImgIds()
+        # img_infos = old_coco.loadImgs(img_ids)
+        # for img_info in img_infos:
+        #   save_coco["images"].append(img_info)
+        #   if img_info["file_name"] == f"{emotion}/{img_name}":
+        #     ann = old_coco.imgToAnns[img_info["id"]][0]
+        #     save_coco["annotations"].append({
+        #         **ann,
+        #         "key_points": keypoints,
+        #         "num_keypoints": 68
+        #     })
               
       if idx % 10 == 0:
         progress_bar.set_postfix(score="{0:.2f}".format(scores[i]))
@@ -173,8 +173,8 @@ def main(cfg:ModelConfig):
 
     os.makedirs(f"{dst_dir_path}/labels/{mode}", exist_ok=True)
     print("writing annotation...")
-    with open(f"{dst_dir_path}/labels/{mode}/annotation.json", "w", encoding="cp949") as f:
-      json.dump(coco_annotation, f)
+    # with open(f"{dst_dir_path}/labels/{mode}/annotation.json", "w", encoding="cp949") as f:
+    #   json.dump(coco_annotation, f)
     with open(f"{dst_dir_path}/labels/{mode}/detected_more_than_one_face.json", "w", encoding="cp949") as f:
       json.dump(detected_more_than_one_face, f)
   print("DONE!")

@@ -1,7 +1,7 @@
 import os
 from core.configs import Resnet50Config
 from torchvision.io import read_image
-from torchvision.models import resnet50, ResNet50_Weights
+from core.models import ResNet50Cls
 from tqdm import tqdm
 import pandas as pd
 
@@ -12,10 +12,9 @@ def resnet50_cls(cfg: Resnet50Config):
   """
   src_dir = cfg.infer_config.src_dir
   _, dst_dir = cfg.get_output_path("inference")
-  pretrained = cfg.infer_config.pretrained
+  weights = cfg.infer_config.pretrained
   
-  weights = ResNet50_Weights[pretrained]
-  model = resnet50(weights=weights)
+  model = ResNet50Cls(weights=weights, num_classes=7)
   model.eval()
   
   preprocess = weights.transforms()
@@ -50,5 +49,6 @@ def resnet50_cls(cfg: Resnet50Config):
       result["class_id"].append(class_id)
       result["score"].append(score)
       result["category_name"].append(category_name)
+  
   pd.DataFrame(result).to_csv(f"{dst_dir}/results.csv")
   

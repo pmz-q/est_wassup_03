@@ -90,9 +90,6 @@ def save_img(index, save_path, emotion, img_name, img):
       path += f"_{index}."
       cv2.imwrite(f"{save_path}/{emotion}/{path + ext}", img)
     else:
-      print(save_path)
-      print(emotion)
-      print(img_name)
       cv2.imwrite(f"{save_path}/{emotion}/{img_name}", img)
 
 def dlib_det(

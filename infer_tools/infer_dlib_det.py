@@ -158,8 +158,8 @@ def dlib_det(
         save_img(i, gray_save_path, emotion, img_name, gray)
       
       # update progress bar postfix
-      if idx % 10 == 0:
-        progress_bar.set_postfix(score="{0:.2f}".format(scores[i]))
+      # if idx % 10 == 0:
+      progress_bar.set_postfix(score="{0:.2f}".format(scores[i]))
     
     # flush cv2
     cv2.destroyAllWindows()

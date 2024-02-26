@@ -59,6 +59,7 @@ class InferConfig:
   pretrained: str
   infer_type: str
   infer_task: str
+  save_mode: Literal["gray", "color", "heatmap"]
 
 class ModelConfig:
   def __init__(

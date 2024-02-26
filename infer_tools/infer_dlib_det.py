@@ -167,7 +167,6 @@ def dlib_det(
     # flush cv2
     cv2.destroyAllWindows()
     progress_bar.update(1)
-    raise
 
 def main(cfg:ModelConfig):
   src_image_dir = f"{cfg.infer_config.src_dir}/images"

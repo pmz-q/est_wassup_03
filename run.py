@@ -57,7 +57,7 @@ def main(cfg):
     train_mapper[config.model_task][config.model_name](config)
   
   if "infer" in run_type:
-    infer_mapper[config.model_task][config.infer_config.infer_type](config)
+    infer_mapper[config.infer_config.infer_task][config.infer_config.infer_type](config)
 
 
 if __name__ == '__main__':

@@ -16,7 +16,11 @@ def resnet152_cls(cfg: Resnet50Config):
   torch.backends.cudnn.deterministic = True
   torch.backends.cudnn.benchmark = False
   
-  model = ResNet152Cls(weights=cfg.train_config.pretrained, num_classes=7)
+  model = ResNet152Cls(
+    weights=cfg.train_config.pretrained,
+    num_classes=7,
+    dropout=cfg.train_config.dropout
+  )
   _, tensorboard_name = cfg.get_output_path("train")
   model.train(
     tensorboard_name=tensorboard_name,

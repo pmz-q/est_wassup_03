@@ -1,7 +1,7 @@
 import os
 from core.configs import Resnet152Config
 from torchvision.io import read_image
-from torchvision.models import resnet152, ResNet152_Weights
+from core.models import ResNet152Cls
 from tqdm import tqdm
 import pandas as pd
 
@@ -12,10 +12,9 @@ def resnet152_cls(cfg: Resnet152Config):
   """
   src_dir = cfg.infer_config.src_dir
   dst_dir = cfg.get_output_path("inference")[1]
-  pretrained = cfg.infer_config.pretrained
+  weights = cfg.infer_config.pretrained
   
-  weights = ResNet152_Weights[pretrained]
-  model = resnet152(weights=weights)
+  model = ResNet152Cls(weights=weights, num_classes=7)
   model.eval()
   
   preprocess = weights.transforms()

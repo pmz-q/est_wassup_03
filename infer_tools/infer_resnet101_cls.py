@@ -1,7 +1,7 @@
 import os
 from core.configs import Resnet101Config
 from torchvision.io import read_image
-from torchvision.models import resnet101, ResNet101_Weights
+from core.models import ResNet101Cls
 from tqdm import tqdm
 import pandas as pd
 
@@ -12,11 +12,10 @@ def resnet101_cls(cfg: Resnet101Config):
   """
   src_dir = cfg.infer_config.src_dir
   dst_dir = cfg.get_output_path("inference")[1]
-  pretrained = cfg.infer_config.pretrained
+  weights = cfg.infer_config.pretrained
   
   # 1. Initialize model with the best avaiable weight
-  weights = ResNet101_Weights[pretrained]
-  model = resnet101(weights=weights)
+  model = ResNet101Cls(weights=weights, num_classes=7)
   model.eval()
   
   # 2. Initialize the inference transforms

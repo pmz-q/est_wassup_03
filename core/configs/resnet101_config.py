@@ -14,4 +14,6 @@ class Resnet101Config(ModelConfig):
     super().load_configs()
     if self.train_config.pretrained == None:
       self.train_config.pretrained = 'DEFAULT'
+    if self.infer_config.pretrained == None:
+      self.infer_config.pretrained = 'DEFAULT'
   

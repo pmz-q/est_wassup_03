@@ -6,6 +6,7 @@ from sklearn.metrics import confusion_matrix
 from torchvision.models import resnet152, ResNet152_Weights
 from torch import nn
 import torch
+import torch.nn.functional as F
 from torch.optim.lr_scheduler import LRScheduler
 from torch.optim.optimizer import Optimizer
 from torch.utils.tensorboard import SummaryWriter
@@ -15,15 +16,14 @@ from .utils import train_one_epoch, evaluate
 
 
 class ResNet152Cls(nn.Module):
-  def __init__(self, weights: str, num_classes: int):
+  def __init__(self, weights: str, num_classes: int, dropout: float=0.0):
     super(ResNet152Cls, self).__init__()
     
     if weights == 'DEFAULT':
       pretrained_weights = ResNet152_Weights.DEFAULT
-    else:
-      raise ValueError(f'Invalid weights name: {weights}')
 
     self.model = resnet152(weights=pretrained_weights)
+    self.model.fc.register_forward_hook(lambda m, inp, out: F.dropout(out, p=dropout, training=m.training))
 
     # Freezing
     # ref doc: https://pytorch.org/vision/stable/models.html

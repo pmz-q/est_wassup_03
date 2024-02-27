@@ -203,6 +203,6 @@ def main(cfg:ModelConfig):
         )
 
     print("finalizing...")
-    with open(f"{dst_mode_dir}/detected_more_than_one_face.json", "w", encoding="cp949") as f:
+    with open(f"{dst_image_dir}/{mode}_detected_more_than_one_face.json", "w", encoding="cp949") as f:
       json.dump(detected_more_than_one_face, f)
   print("DONE!")

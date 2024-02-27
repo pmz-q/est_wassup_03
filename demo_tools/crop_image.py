@@ -1,4 +1,3 @@
-import json
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -37,7 +36,7 @@ def resize_with_padding(cropped_img_array, target_size, padding_scale):
 
   return np.array(padded_image)
 
-def detect_bbox_yolo(filename: str) -> tuple:
+def make_cropped_image(filename: str) -> tuple:
   """
   Args:
     filename (str): uploaded filename. the image must be located in demo_tools/input_images.
@@ -52,8 +51,8 @@ def detect_bbox_yolo(filename: str) -> tuple:
   target_size = (224, 224)
   padding_scale = 0.8
   
-  if not os.path.exists(weights_path): return False, "ERRPR:detect_bbox_yolo:weight file does not exists."
-  if not os.path.isfile(weights_path): return False, "ERROR:detect_bbox_yolo:given weight is a directory not a file."
+  if not os.path.exists(weights_path): return False, "ERRPR:make_cropped_image:weight file does not exists."
+  if not os.path.isfile(weights_path): return False, "ERROR:make_cropped_image:given weight is a directory not a file."
   model = YOLO(weights_path)
   
   try:
@@ -62,7 +61,7 @@ def detect_bbox_yolo(filename: str) -> tuple:
     return False, str(e)
 
   if len(result.boxes.xyxy) == 0:
-    return False, "ERROR:detect_bbox_yolo:no human face found."
+    return False, "ERROR:make_cropped_image:no human face found."
   
   cropped = save_one_box(
     xyxy=result.boxes.xyxy[0],
@@ -83,5 +82,5 @@ def detect_bbox_yolo(filename: str) -> tuple:
 
 if __name__ == "__main__":
   # test code
-  returned = detect_bbox_yolo("example.jpg")
+  returned = make_cropped_image("example.jpg")
   print(returned)

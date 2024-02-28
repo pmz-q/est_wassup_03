@@ -41,9 +41,9 @@ def make_cropped_image(filename: str) -> tuple:
   Args:
     filename (str): uploaded filename. the image must be located in demo_tools/input_images.
   Returns:
-    (is_successful, result_path)
-    is_successful (bool): True if the process was successful. else False
-    result_path (str): absoloute path of the saved result image. Error message when the process is not successfuly done.
+    tuple: (is_successful, result_path)
+      is_successful (bool): True if the process was successful. else False
+      result_path (str): absoloute path of the saved result image. Error message when the process is not successfuly done.
   """
   src = f"{ROOT_PATH}/input_images/{filename}"
   save_path = f"{ROOT_PATH}/results/cropped/{filename}"

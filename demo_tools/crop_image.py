@@ -3,6 +3,7 @@ import numpy as np
 import os
 from pathlib import Path
 from PIL import Image
+import cv2
 from ultralytics import YOLO
 from ultralytics.utils.plotting import save_one_box
 
@@ -36,17 +37,13 @@ def resize_with_padding(cropped_img_array, target_size, padding_scale):
 
   return np.array(padded_image)
 
-def make_cropped_image(filename: str) -> tuple:
+def make_cropped_image(imageArray):
   """
   Args:
-    filename (str): uploaded filename. the image must be located in demo_tools/input_images.
+    // TODO
   Returns:
-    tuple: (is_successful, result_path)
-      is_successful (bool): True if the process was successful. else False
-      result_path (str): absoloute path of the saved result image. Error message when the process is not successfuly done.
+    // TODO
   """
-  src = f"{ROOT_PATH}/input_images/{filename}"
-  save_path = f"{ROOT_PATH}/results/cropped/{filename}"
   weights_path = f"{ROOT_PATH}/weights/crop_weight/yolov8n-face.pt"
   target_size = (224, 224)
   padding_scale = 0.8
@@ -56,7 +53,7 @@ def make_cropped_image(filename: str) -> tuple:
   model = YOLO(weights_path)
   
   try:
-    result = model(src, verbose=False)[0] # predict one file only
+    result = model(imageArray, verbose=False)[0] # predict one file only
   except Exception as e:
     return False, str(e)
 
@@ -76,9 +73,10 @@ def make_cropped_image(filename: str) -> tuple:
     padding_scale=padding_scale
   )
   
-  plt.imsave(save_path, padded)
-
-  return True, save_path
+  save_path = f"{ROOT_PATH}/output_cropped.jpg"
+  plt.imsave(save_path, cv2.cvtColor(padded, cv2.COLOR_BGR2RGB))
+  
+  return padded
 
 if __name__ == "__main__":
   # test code

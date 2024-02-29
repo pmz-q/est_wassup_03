@@ -1,3 +1,12 @@
+# do not upload data
+data/*
+!data/.gitkeep
+yolo_detection_data/*
+features/*
+results/*
+cropped_data/*
+*.pt
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
